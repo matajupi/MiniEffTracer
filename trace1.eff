@@ -1,0 +1,47 @@
+top = comp*
+stat1; stat2 = let _ = stat1 in stat2 (right-associative)
++ - * / fst snd
+don't support currying syntax
+
+# Program
+let backtrack = handler
+    | decide _ k ->
+        with handler
+            | fail _ _ -> k false
+        handle
+            k true
+;;
+
+let rec chooseInt (m, n) =
+    if m > n then
+        fail ()
+    else
+        let b = decide () in
+        if b then
+            m
+        else
+            chooseInt (m + 1, n)
+;;
+
+let sqrt m =
+    let rec try n =
+        let n2 = n * n in
+        if n2 > m then
+            null
+        else if n2 = m then
+            n
+        else
+            try (n + 1)
+    in try 0
+;;
+
+let pythagorean (m, n) =
+    let a = chooseInt (m, n - 1) in
+    let b = chooseInt (a + 1, n) in
+    let c = sqrt(a*a + b*b) in
+    if c then
+        (a, b, c)
+    else
+        fail ()
+;;
+
