@@ -2,25 +2,60 @@
 
 void Tracer::Visit(const Top &top) {
     top.GetContent()->Accept(*this);
-    os_ << std::endl;
 }
-void Tracer::Visit(const Number &num) {
-    ret_ = num.GetValue();
-    os_ << ret_;
+void Tracer::Visit(const Prog &prog) {
+    prog.GetPrev()->Accept(*this);
+    prog.GetExpr()->Accept(*this);
+    os_ << " ;; " << std::endl;
+}
+void Tracer::Visit(const Empty &empty) {
+    // Nop
+}
+void Tracer::Visit(const NInt &num) {
+    ret_ = PInt::GetInstance(num.GetValue());
+    ret_->Dump(os_);
+}
+void Tracer::Visit(const NBool &bol) {
+    ret_ = PBool::GetInstance(bol.GetValue());
+    ret_->Dump(os_);
 }
 void Tracer::Visit(const Add &add) {
-    ProcessBinary(add, [](int lval, int rval) { return lval + rval; });
+    ProcessBinary(add, [](PrimPtr lval, PrimPtr rval) {
+        return lval->Add(rval);
+    });
 }
 void Tracer::Visit(const Sub &sub) {
-    ProcessBinary(sub, [](int lval, int rval) { return lval - rval; });
+    ProcessBinary(sub, [](PrimPtr lval, PrimPtr rval) {
+        return lval->Sub(rval);
+    });
 }
 void Tracer::Visit(const Mul &mul) {
-    ProcessBinary(mul, [](int lval, int rval) { return lval * rval; });
+    ProcessBinary(mul, [](PrimPtr lval, PrimPtr rval) {
+        return lval->Mul(rval);
+    });
 }
 void Tracer::Visit(const Div &div) {
-    ProcessBinary(div, [](int lval, int rval) { return lval / rval; });
+    ProcessBinary(div, [](PrimPtr lval, PrimPtr rval) {
+        return lval->Div(rval);
+    });
 }
-void Tracer::ProcessBinary(const Binary &bin, std::function<int(int, int)> app) {
+void Tracer::Visit(const Less &less) {
+    ProcessBinary(less, [](PrimPtr lval, PrimPtr rval) {
+        return lval->Less(rval);
+    });
+}
+void Tracer::Visit(const Great &grt) {
+    ProcessBinary(grt, [](PrimPtr lval, PrimPtr rval) {
+        return lval->Great(rval);
+    });
+}
+void Tracer::Visit(const Equal &eq) {
+    ProcessBinary(eq, [](PrimPtr lval, PrimPtr rval) {
+        return lval->Equal(rval);
+    });
+}
+void Tracer::ProcessBinary(const Binary &bin,
+    std::function<PrimPtr(PrimPtr, PrimPtr)> app) {
     os_ << "[" << std::endl;
     tabs_++;
 
@@ -37,7 +72,8 @@ void Tracer::ProcessBinary(const Binary &bin, std::function<int(int, int)> app) 
 
     PrintTabs();
     ret_ = app(lval, rval);
-    os_ << ret_ << std::endl;
+    ret_->Dump(os_);
+    os_ << std::endl;
 
     tabs_--;
     PrintTabs();

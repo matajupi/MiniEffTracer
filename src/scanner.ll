@@ -42,6 +42,12 @@ loc.step();
 "/"         return yy::parser::make_SLASH(loc);
 "("         return yy::parser::make_LPAREN(loc);
 ")"         return yy::parser::make_RPAREN(loc);
+";"         return yy::parser::make_SEMICOLON(loc);
+"<"         return yy::parser::make_LESS(loc);
+">"         return yy::parser::make_GREAT(loc);
+"="         return yy::parser::make_EQUAL(loc);
+"true"      return yy::parser::make_TRUE(loc);
+"false"     return yy::parser::make_FALSE(loc);
 
 {int}       return make_NUMBER(yytext, loc);
 {id}        return yy::parser::make_IDENT(yytext, loc);

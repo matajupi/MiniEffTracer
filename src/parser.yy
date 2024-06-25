@@ -33,29 +33,46 @@ class Driver;
     SLASH   "/"
     LPAREN  "("
     RPAREN  ")"
+    SEMICOLON ";"
+    LESS    "<"
+    GREAT   ">"
+    EQUAL   "="
+    TRUE    "true"
+    FALSE   "false"
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
-%nterm <std::shared_ptr<Expr>> expr
+%nterm <std::shared_ptr<Node>> expr prog
 
 %printer { yyo << $$; } <*>;
 
 %%
-
 %start top;
-top: expr { drv.SetResult(std::make_shared<Top>($1)); } ;
 
+top: prog { drv.SetResult(std::make_shared<Top>($1)); } ;
+
+prog:
+    %empty { $$ = std::make_shared<Empty>(); }
+  | prog expr ";"";" { $$ = std::make_shared<Prog>($1, $2); } ;
+
+%left "=";
+%left "<" ">";
 %left "+" "-";
 %left "*" "/";
 
 expr:
-   "number"         { $$ = std::make_shared<Number>($1); }
- | expr "+" expr    { $$ = std::make_shared<Add>($1, $3); }
- | expr "-" expr    { $$ = std::make_shared<Sub>($1, $3); }
- | expr "*" expr    { $$ = std::make_shared<Mul>($1, $3); }
- | expr "/" expr    { $$ = std::make_shared<Div>($1, $3); }
- | "(" expr ")"     { $$ = $2; }
- ;
+    "true" { $$ = std::make_shared<NBool>(true); }
+  | "false" { $$ = std::make_shared<NBool>(false); }
+  | "number" { $$ = std::make_shared<NInt>($1); }
+  | expr "+" expr { $$ = std::make_shared<Add>($1, $3); }
+  | expr "-" expr { $$ = std::make_shared<Sub>($1, $3); }
+  | expr "*" expr { $$ = std::make_shared<Mul>($1, $3); }
+  | expr "/" expr { $$ = std::make_shared<Div>($1, $3); }
+  | expr "<" expr { $$ = std::make_shared<Less>($1, $3); }
+  | expr ">" expr { $$ = std::make_shared<Great>($1, $3); }
+  | expr "=" expr { $$ = std::make_shared<Equal>($1, $3); }
+  | "(" expr ")" { $$ = $2; }
+;
 
 %%
 
