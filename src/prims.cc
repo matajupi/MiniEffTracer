@@ -1,4 +1,6 @@
-#include "prim.h"
+#include "prims.h"
+
+#include "excepts.h"
 
 template <typename T>
 std::shared_ptr<T> Prim::Cast(std::shared_ptr<Prim> before) {
@@ -22,13 +24,13 @@ std::shared_ptr<Prim> PInt::Add(std::shared_ptr<Prim> other) {
     return GetInstance(value_ + Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Sub(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ + Cast<PInt>(other)->value_);
+    return GetInstance(value_ - Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Mul(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ + Cast<PInt>(other)->value_);
+    return GetInstance(value_ * Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Div(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ + Cast<PInt>(other)->value_);
+    return GetInstance(value_ / Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Less(std::shared_ptr<Prim> other) {
     return PBool::GetInstance(value_ < Cast<PInt>(other)->value_);

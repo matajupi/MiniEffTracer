@@ -2,9 +2,11 @@ ident x, y, z
 natural n, m
 expression e ::= x | true | false | n | () | e e
     | e + e | e - e | e * e | e / e | e < e | e > e | e = e (left associative)
-    | let x = e in e | let rec x y = e in e
+    | let x = e in e end | let x y = e in e end
+    | fun x -> e end
     | e; e (right associative)
-definition d ::= e ;;
+    | if e then e else e end
+definition d ::= let x = e | let x y = e
 
 # Program
 let backtrack = handler

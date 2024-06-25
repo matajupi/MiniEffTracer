@@ -39,6 +39,9 @@ class Driver;
     EQUAL   "="
     TRUE    "true"
     FALSE   "false"
+    LET     "let"
+    IN      "in"
+    END     "end"
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
@@ -64,6 +67,7 @@ expr:
     "true" { $$ = std::make_shared<NBool>(true); }
   | "false" { $$ = std::make_shared<NBool>(false); }
   | "number" { $$ = std::make_shared<NInt>($1); }
+  | "ident" { $$ = std::make_shared<Ident>($1); }
   | expr "+" expr { $$ = std::make_shared<Add>($1, $3); }
   | expr "-" expr { $$ = std::make_shared<Sub>($1, $3); }
   | expr "*" expr { $$ = std::make_shared<Mul>($1, $3); }
@@ -71,6 +75,7 @@ expr:
   | expr "<" expr { $$ = std::make_shared<Less>($1, $3); }
   | expr ">" expr { $$ = std::make_shared<Great>($1, $3); }
   | expr "=" expr { $$ = std::make_shared<Equal>($1, $3); }
+  | "let" "ident" "=" expr "in" expr "end" { $$ = std::make_shared<Let1>($2, $4, $6); }
   | "(" expr ")" { $$ = $2; }
 ;
 

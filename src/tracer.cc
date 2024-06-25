@@ -1,5 +1,7 @@
 #include "tracer.h"
 
+#include "excepts.h"
+
 void Tracer::Visit(const Top &top) {
     top.GetContent()->Accept(*this);
 }
@@ -18,6 +20,48 @@ void Tracer::Visit(const NInt &num) {
 void Tracer::Visit(const NBool &bol) {
     ret_ = PBool::GetInstance(bol.GetValue());
     ret_->Dump(os_);
+}
+void Tracer::Visit(const Ident &ident) {
+    auto str = ident.GetStr();
+    os_ << "[" << str << " => ";
+
+    ret_ = env_->Lookup(str);
+    ret_->Dump(os_);
+
+    os_ << "]";
+}
+void Tracer::Visit(const Let1 &let) {
+    os_ << "[" << std::endl;
+    tabs_++;
+
+    auto var = let.GetVar();
+
+    PrintTabs();
+    os_ << "let " << var << " = ";
+
+    let.GetBexpr()->Accept(*this);
+
+    env_ = std::make_shared<Env>(env_);
+    env_->Register(var, ret_);
+
+    os_ << " in ";
+
+    let.GetCexpr()->Accept(*this);
+
+    env_ = env_->GetParent();
+
+    os_ << std::endl;
+
+    PrintTabs();
+    os_ << "=>" << std::endl;
+
+    PrintTabs();
+    ret_->Dump(os_);
+    os_ << std::endl;
+
+    tabs_--;
+    PrintTabs();
+    os_ << "]";
 }
 void Tracer::Visit(const Add &add) {
     ProcessBinary(add, [](PrimPtr lval, PrimPtr rval) {
@@ -81,6 +125,6 @@ void Tracer::ProcessBinary(const Binary &bin,
 }
 void Tracer::PrintTabs() {
     for (int i = 0; tabs_ > i; i++) {
-        os_ << "\t";
+        os_ << "  ";
     }
 }

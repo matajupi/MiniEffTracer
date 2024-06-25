@@ -6,18 +6,6 @@
 #include <iostream>
 #include <map>
 
-class CastFailureException : public std::exception {
-    char *what() {
-        return (char *)"CastFailureException";
-    }
-};
-
-class UnsupportedOperatorException : public std::exception {
-    char *what() {
-        return (char *)"UnsupportedOperatorException";
-    }
-};
-
 class Prim {
 public:
     virtual std::shared_ptr<Prim> Add(std::shared_ptr<Prim> other) = 0;

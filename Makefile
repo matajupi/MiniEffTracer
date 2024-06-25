@@ -7,7 +7,8 @@ LINT = cpplint
 B = bin
 S = src
 
-SRCS 	= $(S)/main.cc $(S)/driver.cc $(S)/nodes.cc $(S)/tracer.cc $(S)/prim.cc
+SRCS 	= $(S)/main.cc $(S)/driver.cc $(S)/nodes.cc $(S)/tracer.cc $(S)/prims.cc \
+		  $(S)/env.cc
 SCAN 	= $(S)/scanner.ll
 PARSE 	= $(S)/parser.yy
 SCANCC 	= $(SCAN:$(S)/%.ll=$(B)/%.cc)

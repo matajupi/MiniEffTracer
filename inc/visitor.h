@@ -9,6 +9,8 @@ public:
     virtual void Visit(const Empty &empty) = 0;
     virtual void Visit(const NInt &num) = 0;
     virtual void Visit(const NBool &bol) = 0;
+    virtual void Visit(const Ident &ident) = 0;
+    virtual void Visit(const Let1 &let) = 0;
     virtual void Visit(const Add &add) = 0;
     virtual void Visit(const Sub &sub) = 0;
     virtual void Visit(const Mul &mul) = 0;

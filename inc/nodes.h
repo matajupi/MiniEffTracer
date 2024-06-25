@@ -69,6 +69,36 @@ private:
     bool value_;
 };
 
+class Ident : public Node {
+public:
+    Ident(std::string str) : str_(str) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::string GetStr() const { return str_; }
+
+private:
+    std::string str_;
+};
+
+class Let1 : public Node {
+public:
+    Let1(std::string var, std::shared_ptr<Node> bexpr,
+        std::shared_ptr<Node> cexpr)
+        : var_(var), bexpr_(bexpr), cexpr_(cexpr) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::string GetVar() const { return var_; }
+    std::shared_ptr<Node> GetBexpr() const { return bexpr_; }
+    std::shared_ptr<Node> GetCexpr() const { return cexpr_; }
+
+private:
+    std::string var_;
+    std::shared_ptr<Node> bexpr_;
+    std::shared_ptr<Node> cexpr_;
+};
+
 class Binary : public Node {
 public:
     Binary(std::shared_ptr<Node> left, std::shared_ptr<Node> right)

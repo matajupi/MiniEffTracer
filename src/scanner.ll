@@ -48,6 +48,9 @@ loc.step();
 "="         return yy::parser::make_EQUAL(loc);
 "true"      return yy::parser::make_TRUE(loc);
 "false"     return yy::parser::make_FALSE(loc);
+"let"       return yy::parser::make_LET(loc);
+"in"        return yy::parser::make_IN(loc);
+"end"       return yy::parser::make_END(loc);
 
 {int}       return make_NUMBER(yytext, loc);
 {id}        return yy::parser::make_IDENT(yytext, loc);
