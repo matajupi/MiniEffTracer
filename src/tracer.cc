@@ -39,7 +39,7 @@ void Tracer::Visit(const Let1 &let) {
 
     auto var = let.GetVar();
 
-    os_ << "(" << "let " << var << " = ";
+    os_ << "let " << var << " = ";
 
     let.GetBexpr()->Accept(*this);
 
@@ -50,8 +50,6 @@ void Tracer::Visit(const Let1 &let) {
 
     let.GetCexpr()->Accept(*this);
     env_ = env_->GetParent();
-
-    os_ << ")";
 
     Newline();
 
@@ -65,8 +63,6 @@ void Tracer::Visit(const Let1 &let) {
 void Tracer::Visit(const App &app) {
     In();
 
-    os_ << "(";
-
     app.GetFun()->Accept(*this);
     auto fun = std::dynamic_pointer_cast<PFun>(ret_);
     if (fun == nullptr) {
@@ -78,7 +74,6 @@ void Tracer::Visit(const App &app) {
     app.GetArg()->Accept(*this);
     auto arg = ret_;
 
-    os_ << ")";
     Newline();
 
     os_ << "=>";
@@ -88,6 +83,39 @@ void Tracer::Visit(const App &app) {
     env_->Register(fun->GetVar(), arg);
     fun->GetBody()->Accept(*this);
 
+    Newline();
+
+    os_ << "=>";
+    Newline();
+
+    ret_->Dump(os_);
+
+    Out();
+}
+void Tracer::Visit(const If &ifn) {
+    In();
+
+    os_ << "if ";
+    ifn.GetCond()->Accept(*this);
+    os_ << " then ";
+    ifn.GetIfClause()->Dump(os_);
+    os_ << " else ";
+    ifn.GetElseClause()->Dump(os_);
+    Newline();
+
+    os_ << "=>";
+    Newline();
+
+    auto cond = std::dynamic_pointer_cast<PBool>(ret_);
+    if (cond == nullptr) {
+        throw UnsupportedOperatorException();
+    }
+    if (cond->GetValue()) {
+        ifn.GetIfClause()->Accept(*this);
+    }
+    else {
+        ifn.GetElseClause()->Accept(*this);
+    }
     Newline();
 
     os_ << "=>";

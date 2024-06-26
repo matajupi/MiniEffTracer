@@ -43,6 +43,9 @@ class Driver;
     IN      "in"
     FUN     "fun"
     RIGHTARROW "->"
+    IF      "if"
+    THEN    "then"
+    ELSE    "else"
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
@@ -64,6 +67,8 @@ topexpr:
   | "fun" "ident" "->" topexpr { $$ = std::make_shared<NFun>($2, $4); }
   | "let" "ident" "=" topexpr "in" topexpr
     { $$ = std::make_shared<Let1>($2, $4, $6); }
+  | "if" topexpr "then" topexpr "else" topexpr
+    { $$ = std::make_shared<If>($2, $4, $6); }
 ;
 
 %left "=";

@@ -2,10 +2,10 @@ ident x, y, z
 natural n, m
 expression e ::= x | true | false | n | () | e e
     | e + e | e - e | e * e | e / e | e < e | e > e | e = e (left associative)
-    | let x = e in e end | let x y = e in e end
-    | fun x -> e end
+    | let x = e in e | let x y = e in e
+    | fun x -> e
     | e; e (right associative)
-    | if e then e else e end
+    | if e then e else e
 definition d ::= let x = e | let x y = e
 
 # Program

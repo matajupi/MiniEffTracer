@@ -24,6 +24,7 @@ public:
     void Visit(const Ident &ident) override;
     void Visit(const Let1 &let) override;
     void Visit(const App &app) override;
+    void Visit(const If &ifn) override;
     void Visit(const Add &add) override;
     void Visit(const Sub &sub) override;
     void Visit(const Mul &mul) override;

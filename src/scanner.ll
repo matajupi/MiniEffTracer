@@ -52,6 +52,9 @@ loc.step();
 "in"        return yy::parser::make_IN(loc);
 "fun"       return yy::parser::make_FUN(loc);
 "->"        return yy::parser::make_RIGHTARROW(loc);
+"if"        return yy::parser::make_IF(loc);
+"then"      return yy::parser::make_THEN(loc);
+"else"      return yy::parser::make_ELSE(loc);
 
 {int}       return make_NUMBER(yytext, loc);
 {id}        return yy::parser::make_IDENT(yytext, loc);

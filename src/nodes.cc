@@ -60,6 +60,17 @@ void App::Dump(std::ostream &os) const {
 }
 void App::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
+void If::Dump(std::ostream &os) const {
+    os << "(" << "if ";
+    cond_->Dump(os);
+    os << " then ";
+    if_clause_->Dump(os);
+    os << " else ";
+    else_clause_->Dump(os);
+    os << ")";
+}
+void If::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
 void Binary::Dump(std::ostream &os) const {
     os << "(";
     left_->Dump(os);

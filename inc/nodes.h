@@ -129,6 +129,24 @@ private:
     std::shared_ptr<Node> arg_;
 };
 
+class If : public Node {
+public:
+    If(std::shared_ptr<Node> cond, std::shared_ptr<Node> if_clause,
+        std::shared_ptr<Node> else_clause)
+        : cond_(cond), if_clause_(if_clause), else_clause_(else_clause) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::shared_ptr<Node> GetCond() const { return cond_; }
+    std::shared_ptr<Node> GetIfClause() const { return if_clause_; }
+    std::shared_ptr<Node> GetElseClause() const { return else_clause_; }
+
+private:
+    std::shared_ptr<Node> cond_;
+    std::shared_ptr<Node> if_clause_;
+    std::shared_ptr<Node> else_clause_;
+};
+
 class Binary : public Node {
 public:
     Binary(std::shared_ptr<Node> left, std::shared_ptr<Node> right)
