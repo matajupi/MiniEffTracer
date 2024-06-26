@@ -29,37 +29,44 @@ blank   [ \t\r]
 %%
 
 %{
+#define MKSYM(name) if (!comment) return yy::parser::make_ ## name(loc)
+
 yy::location &loc = drv.GetLocation();
 loc.step();
+bool comment = false;
 %}
 
 {blank}+    loc.step();
 \n+         { loc.lines(yyleng); loc.step(); }
 
-"-"         return yy::parser::make_MINUS(loc);
-"+"         return yy::parser::make_PLUS(loc);
-"*"         return yy::parser::make_ASTER(loc);
-"/"         return yy::parser::make_SLASH(loc);
-"("         return yy::parser::make_LPAREN(loc);
-")"         return yy::parser::make_RPAREN(loc);
-";"         return yy::parser::make_SEMICOLON(loc);
-"<"         return yy::parser::make_LESS(loc);
-">"         return yy::parser::make_GREAT(loc);
-"="         return yy::parser::make_EQUAL(loc);
-"true"      return yy::parser::make_TRUE(loc);
-"false"     return yy::parser::make_FALSE(loc);
-"let"       return yy::parser::make_LET(loc);
-"in"        return yy::parser::make_IN(loc);
-"fun"       return yy::parser::make_FUN(loc);
-"->"        return yy::parser::make_RIGHTARROW(loc);
-"if"        return yy::parser::make_IF(loc);
-"then"      return yy::parser::make_THEN(loc);
-"else"      return yy::parser::make_ELSE(loc);
+"(*"        { comment = true; }
+"*)"        { comment = false; }
 
-{int}       return make_NUMBER(yytext, loc);
-{id}        return yy::parser::make_IDENT(yytext, loc);
+"true"      { MKSYM(TRUE); }
+"false"     { MKSYM(FALSE); }
+"let"       { MKSYM(LET); }
+"in"        { MKSYM(IN); }
+"fun"       { MKSYM(FUN); }
+"if"        { MKSYM(IF); }
+"then"      { MKSYM(THEN); }
+"else"      { MKSYM(ELSE); }
+"rec"       { MKSYM(REC); }
+"->"        { MKSYM(RIGHTARROW); }
+"-"         { MKSYM(MINUS); }
+"+"         { MKSYM(PLUS); }
+"*"         { MKSYM(ASTER); }
+"/"         { MKSYM(SLASH); }
+"("         { MKSYM(LPAREN); }
+")"         { MKSYM(RPAREN); }
+";"         { MKSYM(SEMICOLON); }
+"<"         { MKSYM(LESS); }
+">"         { MKSYM(GREAT); }
+"="         { MKSYM(EQUAL); }
+
+{int}       { if (!comment) return make_NUMBER(yytext, loc); }
+{id}        { if (!comment) return yy::parser::make_IDENT(yytext, loc); }
 .           {
-                throw yy::parser::syntax_error(
+                if (!comment) throw yy::parser::syntax_error(
                     loc, "invalid character: " + std::string(yytext));
             }
 <<EOF>>     return yy::parser::make_YYEOF(loc);

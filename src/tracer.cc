@@ -59,6 +59,32 @@ void Tracer::Visit(const Let1 &let) {
 
     Out();
 }
+void Tracer::Visit(const LetRec1 &let) {
+    In();
+
+    auto var = let.GetVar();
+
+    os_ << "let rec " << var << " = ";
+
+    env_ = std::make_shared<Env>(env_);
+    env_->Register(var, PUnit::GetInstance());
+    let.GetBexpr()->Accept(*this);
+
+    os_ << " in ";
+
+    env_->Register(var, ret_);
+    let.GetCexpr()->Accept(*this);
+    env_ = env_->GetParent();
+
+    Newline();
+
+    os_ << "=>";
+    Newline();
+
+    ret_->Dump(os_);
+
+    Out();
+}
 void Tracer::Visit(const App &app) {
     In();
 

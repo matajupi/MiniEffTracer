@@ -114,6 +114,24 @@ private:
     std::shared_ptr<Node> cexpr_;
 };
 
+class LetRec1 : public Node {
+public:
+    LetRec1(std::string var, std::shared_ptr<Node> bexpr,
+        std::shared_ptr<Node> cexpr)
+        : var_(var), bexpr_(bexpr), cexpr_(cexpr) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::string GetVar() const { return var_; }
+    std::shared_ptr<Node> GetBexpr() const { return bexpr_; }
+    std::shared_ptr<Node> GetCexpr() const { return cexpr_; }
+
+private:
+    std::string var_;
+    std::shared_ptr<Node> bexpr_;
+    std::shared_ptr<Node> cexpr_;
+};
+
 class App : public Node {
 public:
     App(std::shared_ptr<Node> fun, std::shared_ptr<Node> arg)

@@ -51,6 +51,15 @@ void Let1::Dump(std::ostream &os) const {
 }
 void Let1::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
+void LetRec1::Dump(std::ostream &os) const {
+    os << "(" << "let rec " << var_ << " = ";
+    bexpr_->Dump(os);
+    os << " in ";
+    cexpr_->Dump(os);
+    os << ")";
+}
+void LetRec1::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
 void App::Dump(std::ostream &os) const {
     os << "(";
     fun_->Dump(os);

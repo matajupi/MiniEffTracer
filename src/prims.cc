@@ -32,7 +32,7 @@ std::shared_ptr<Prim> Prim::Equal(std::shared_ptr<Prim> other) {
     throw UnsupportedOperatorException();
 }
 
-std::map<int, std::shared_ptr<PInt>> PInt::storage_{};
+std::map<int, std::shared_ptr<PInt>> PInt::storage_;
 std::shared_ptr<PInt> PInt::GetInstance(int value) {
     if (storage_.find(value) != storage_.end()) {
         return storage_[value];
@@ -66,7 +66,7 @@ void PInt::Dump(std::ostream &os) {
     os << value_;
 }
 
-std::map<bool, std::shared_ptr<PBool>> PBool::storage_{};
+std::map<bool, std::shared_ptr<PBool>> PBool::storage_;
 std::shared_ptr<PBool> PBool::GetInstance(bool value) {
     if (storage_.find(value) != storage_.end()) {
         return storage_[value];
@@ -91,3 +91,7 @@ void PFun::Dump(std::ostream &os) {
     os << ")";
 }
 
+std::shared_ptr<PUnit> PUnit::instance_ = std::make_shared<PUnit>();
+void PUnit::Dump(std::ostream &os) {
+    os << "()";
+}

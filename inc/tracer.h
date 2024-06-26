@@ -23,6 +23,7 @@ public:
     void Visit(const NFun &fun) override;
     void Visit(const Ident &ident) override;
     void Visit(const Let1 &let) override;
+    void Visit(const LetRec1 &let) override;
     void Visit(const App &app) override;
     void Visit(const If &ifn) override;
     void Visit(const Add &add) override;

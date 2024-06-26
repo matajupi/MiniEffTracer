@@ -1,0 +1,5 @@
+let rec f = fun x -> if x > 100 then x - 10 else f (f (x + 11)) in f 80 ;;
+let rec f = fun x -> if x > 100 then x - 10 else f (f (x + 11)) in f 120 ;;
+let rec f = fun x -> if x > 100 then x - 10 else f (f (x + 11)) in f ;;
+
+

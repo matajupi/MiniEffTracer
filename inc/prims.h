@@ -90,3 +90,17 @@ private:
     std::shared_ptr<Env> env_;
 };
 
+class PUnit : public Prim {
+public:
+    static std::shared_ptr<PUnit> GetInstance() {
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<PUnit>();
+        }
+        return instance_;
+    }
+
+    void Dump(std::ostream &os) override;
+
+private:
+    static std::shared_ptr<PUnit> instance_;
+};
