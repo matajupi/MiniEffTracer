@@ -25,6 +25,10 @@ void Tracer::Visit(const NFun &fun) {
     ret_ = PFun::GetInstance(fun.GetVar(), fun.GetBody(), env_);
     ret_->Dump(os_);
 }
+void Tracer::Visit(const NUnit &unit) {
+    ret_ = PUnit::GetInstance();
+    ret_->Dump(os_);
+}
 void Tracer::Visit(const Ident &ident) {
     auto str = ident.GetStr();
     os_ << "[" << str << " => ";

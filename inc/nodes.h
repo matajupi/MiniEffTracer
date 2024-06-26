@@ -84,6 +84,12 @@ private:
     std::shared_ptr<Node> body_;
 };
 
+class NUnit : public Node {
+public:
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+};
+
 class Ident : public Node {
 public:
     Ident(std::string str) : str_(str) { }

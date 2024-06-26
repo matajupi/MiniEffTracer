@@ -10,6 +10,7 @@ public:
     virtual void Visit(const NInt &num) = 0;
     virtual void Visit(const NBool &bol) = 0;
     virtual void Visit(const NFun &fun) = 0;
+    virtual void Visit(const NUnit &unit) = 0;
     virtual void Visit(const Ident &ident) = 0;
     virtual void Visit(const Let1 &let) = 0;
     virtual void Visit(const LetRec1 &let) = 0;

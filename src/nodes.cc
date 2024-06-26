@@ -16,7 +16,7 @@ void Prog::Dump(std::ostream &os) const {
 void Prog::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void Empty::Dump(std::ostream &os) const {
-    os << "[EOF]" << std::endl;
+    // Nop
 }
 void Empty::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
@@ -36,6 +36,11 @@ void NFun::Dump(std::ostream &os) const {
     os << ")";
 }
 void NFun::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void NUnit::Dump(std::ostream &os) const {
+    os << "()";
+}
+void NUnit::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void Ident::Dump(std::ostream &os) const {
     os << str_;

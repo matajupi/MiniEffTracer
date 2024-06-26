@@ -100,9 +100,9 @@ btexpr:
   | "false" { $$ = std::make_shared<NBool>(false); }
   | "number" { $$ = std::make_shared<NInt>($1); }
   | "ident" { $$ = std::make_shared<Ident>($1); }
+  | "(" ")" { $$ = std::make_shared<NUnit>(); }
   | "(" topexpr ")" { $$ = $2; }
 ;
-
 
 %%
 
