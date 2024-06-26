@@ -43,11 +43,11 @@ void Ident::Dump(std::ostream &os) const {
 void Ident::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void Let1::Dump(std::ostream &os) const {
-    os << "let " << var_ << " = ";
+    os << "(" << "let " << var_ << " = ";
     bexpr_->Dump(os);
     os << " in ";
     cexpr_->Dump(os);
-    os << " end";
+    os << ")";
 }
 void Let1::Accept(Visitor &visitor) { visitor.Visit(*this); }
 

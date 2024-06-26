@@ -39,7 +39,7 @@ void Tracer::Visit(const Let1 &let) {
 
     auto var = let.GetVar();
 
-    os_ << "let " << var << " = ";
+    os_ << "(" << "let " << var << " = ";
 
     let.GetBexpr()->Accept(*this);
 
@@ -50,6 +50,8 @@ void Tracer::Visit(const Let1 &let) {
 
     let.GetCexpr()->Accept(*this);
     env_ = env_->GetParent();
+
+    os_ << ")";
 
     Newline();
 

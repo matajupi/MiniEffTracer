@@ -50,7 +50,6 @@ loc.step();
 "false"     return yy::parser::make_FALSE(loc);
 "let"       return yy::parser::make_LET(loc);
 "in"        return yy::parser::make_IN(loc);
-"end"       return yy::parser::make_END(loc);
 "fun"       return yy::parser::make_FUN(loc);
 "->"        return yy::parser::make_RIGHTARROW(loc);
 
