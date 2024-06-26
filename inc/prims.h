@@ -8,7 +8,7 @@
 
 #include "nodes.h"
 
-class Node;
+class Env;
 
 class Prim {
 public:
@@ -69,15 +69,16 @@ private:
 class PFun : public Prim {
 public:
     static std::shared_ptr<PFun> GetInstance(
-        std::string var, std::shared_ptr<Node> body) {
-        return std::make_shared<PFun>(var, body);
+        std::string var, std::shared_ptr<Node> body, std::shared_ptr<Env> env) {
+        return std::make_shared<PFun>(var, body, env);
     }
 
-    PFun(std::string var, std::shared_ptr<Node> body)
-        : var_(var), body_(body) { }
+    PFun(std::string var, std::shared_ptr<Node> body, std::shared_ptr<Env> env)
+        : var_(var), body_(body), env_(env) { }
 
     std::string GetVar() const { return var_; }
     std::shared_ptr<Node> GetBody() const { return body_; }
+    std::shared_ptr<Env> GetEnv() const { return env_; }
 
     std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
 
@@ -86,5 +87,6 @@ public:
 private:
     std::string var_;
     std::shared_ptr<Node> body_;
+    std::shared_ptr<Env> env_;
 };
 

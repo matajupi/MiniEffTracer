@@ -22,7 +22,7 @@ void Tracer::Visit(const NBool &bol) {
     ret_->Dump(os_);
 }
 void Tracer::Visit(const NFun &fun) {
-    ret_ = PFun::GetInstance(fun.GetVar(), fun.GetBody());
+    ret_ = PFun::GetInstance(fun.GetVar(), fun.GetBody(), env_);
     ret_->Dump(os_);
 }
 void Tracer::Visit(const Ident &ident) {
@@ -43,11 +43,10 @@ void Tracer::Visit(const Let1 &let) {
 
     let.GetBexpr()->Accept(*this);
 
-    env_ = std::make_shared<Env>(env_);
-    env_->Register(var, ret_);
-
     os_ << " in ";
 
+    env_ = std::make_shared<Env>(env_);
+    env_->Register(var, ret_);
     let.GetCexpr()->Accept(*this);
     env_ = env_->GetParent();
 
@@ -79,9 +78,11 @@ void Tracer::Visit(const App &app) {
     os_ << "=>";
     Newline();
 
-    env_ = std::make_shared<Env>(env_);
+    auto cenv = env_;
+    env_ = std::make_shared<Env>(fun->GetEnv());
     env_->Register(fun->GetVar(), arg);
     fun->GetBody()->Accept(*this);
+    env_ = cenv;
 
     Newline();
 
