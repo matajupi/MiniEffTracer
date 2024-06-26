@@ -21,6 +21,10 @@ void Tracer::Visit(const NBool &bol) {
     ret_ = PBool::GetInstance(bol.GetValue());
     ret_->Dump(os_);
 }
+void Tracer::Visit(const NFun &fun) {
+    ret_ = PFun::GetInstance(fun.GetVar(), fun.GetBody());
+    ret_->Dump(os_);
+}
 void Tracer::Visit(const Ident &ident) {
     auto str = ident.GetStr();
     os_ << "[" << str << " => ";
@@ -31,12 +35,10 @@ void Tracer::Visit(const Ident &ident) {
     os_ << "]";
 }
 void Tracer::Visit(const Let1 &let) {
-    os_ << "[" << std::endl;
-    tabs_++;
+    In();
 
     auto var = let.GetVar();
 
-    PrintTabs();
     os_ << "let " << var << " = ";
 
     let.GetBexpr()->Accept(*this);
@@ -47,21 +49,51 @@ void Tracer::Visit(const Let1 &let) {
     os_ << " in ";
 
     let.GetCexpr()->Accept(*this);
-
     env_ = env_->GetParent();
 
-    os_ << std::endl;
+    Newline();
 
-    PrintTabs();
-    os_ << "=>" << std::endl;
+    os_ << "=>";
+    Newline();
 
-    PrintTabs();
     ret_->Dump(os_);
-    os_ << std::endl;
 
-    tabs_--;
-    PrintTabs();
-    os_ << "]";
+    Out();
+}
+void Tracer::Visit(const App &app) {
+    In();
+
+    os_ << "(";
+
+    app.GetFun()->Accept(*this);
+    auto fun = std::dynamic_pointer_cast<PFun>(ret_);
+    if (fun == nullptr) {
+        throw UnsupportedOperatorException();
+    }
+
+    os_ << " ";
+
+    app.GetArg()->Accept(*this);
+    auto arg = ret_;
+
+    os_ << ")";
+    Newline();
+
+    os_ << "=>";
+    Newline();
+
+    env_ = std::make_shared<Env>(env_);
+    env_->Register(fun->GetVar(), arg);
+    fun->GetBody()->Accept(*this);
+
+    Newline();
+
+    os_ << "=>";
+    Newline();
+
+    ret_->Dump(os_);
+
+    Out();
 }
 void Tracer::Visit(const Add &add) {
     ProcessBinary(add, [](PrimPtr lval, PrimPtr rval) {
@@ -100,28 +132,40 @@ void Tracer::Visit(const Equal &eq) {
 }
 void Tracer::ProcessBinary(const Binary &bin,
     std::function<PrimPtr(PrimPtr, PrimPtr)> app) {
-    os_ << "[" << std::endl;
-    tabs_++;
+    In();
 
-    PrintTabs();
     bin.GetLeft()->Accept(*this);
     auto lval = ret_;
+
     os_ << " " << bin.GetOpSym() << " ";
+
     bin.GetRight()->Accept(*this);
     auto rval = ret_;
-    os_ << std::endl;
 
-    PrintTabs();
-    os_ << "=>" << std::endl;
+    Newline();
 
-    PrintTabs();
+    os_ << "=>";
+    Newline();
+
     ret_ = app(lval, rval);
     ret_->Dump(os_);
-    os_ << std::endl;
 
+    Out();
+}
+void Tracer::In() {
+    os_ << "[" << std::endl;
+    tabs_++;
+    PrintTabs();
+}
+void Tracer::Out() {
+    os_ << std::endl;
     tabs_--;
     PrintTabs();
     os_ << "]";
+}
+void Tracer::Newline() {
+    os_ << std::endl;
+    PrintTabs();
 }
 void Tracer::PrintTabs() {
     for (int i = 0; tabs_ > i; i++) {

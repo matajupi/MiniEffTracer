@@ -10,6 +10,27 @@ std::shared_ptr<T> Prim::Cast(std::shared_ptr<Prim> before) {
     }
     return after;
 }
+std::shared_ptr<Prim> Prim::Add(std::shared_ptr<Prim> other) {
+    throw UnsupportedOperatorException();
+}
+std::shared_ptr<Prim> Prim::Sub(std::shared_ptr<Prim> other) {
+    throw UnsupportedOperatorException();
+}
+std::shared_ptr<Prim> Prim::Mul(std::shared_ptr<Prim> other) {
+    throw UnsupportedOperatorException();
+}
+std::shared_ptr<Prim> Prim::Div(std::shared_ptr<Prim> other) {
+    throw UnsupportedOperatorException();
+}
+std::shared_ptr<Prim> Prim::Less(std::shared_ptr<Prim> other) {
+    throw UnsupportedOperatorException();
+}
+std::shared_ptr<Prim> Prim::Great(std::shared_ptr<Prim> other) {
+    throw UnsupportedOperatorException();
+}
+std::shared_ptr<Prim> Prim::Equal(std::shared_ptr<Prim> other) {
+    throw UnsupportedOperatorException();
+}
 
 std::map<int, std::shared_ptr<PInt>> PInt::storage_{};
 std::shared_ptr<PInt> PInt::GetInstance(int value) {
@@ -21,16 +42,16 @@ std::shared_ptr<PInt> PInt::GetInstance(int value) {
     return inst;
 }
 std::shared_ptr<Prim> PInt::Add(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ + Cast<PInt>(other)->value_);
+    return PInt::GetInstance(value_ + Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Sub(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ - Cast<PInt>(other)->value_);
+    return PInt::GetInstance(value_ - Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Mul(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ * Cast<PInt>(other)->value_);
+    return PInt::GetInstance(value_ * Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Div(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ / Cast<PInt>(other)->value_);
+    return PInt::GetInstance(value_ / Cast<PInt>(other)->value_);
 }
 std::shared_ptr<Prim> PInt::Less(std::shared_ptr<Prim> other) {
     return PBool::GetInstance(value_ < Cast<PInt>(other)->value_);
@@ -54,27 +75,19 @@ std::shared_ptr<PBool> PBool::GetInstance(bool value) {
     storage_[value] = inst;
     return inst;
 }
-std::shared_ptr<Prim> PBool::Add(std::shared_ptr<Prim> other) {
-    throw UnsupportedOperatorException();
-}
-std::shared_ptr<Prim> PBool::Sub(std::shared_ptr<Prim> other) {
-    throw UnsupportedOperatorException();
-}
-std::shared_ptr<Prim> PBool::Mul(std::shared_ptr<Prim> other) {
-    throw UnsupportedOperatorException();
-}
-std::shared_ptr<Prim> PBool::Div(std::shared_ptr<Prim> other) {
-    throw UnsupportedOperatorException();
-}
-std::shared_ptr<Prim> PBool::Less(std::shared_ptr<Prim> other) {
-    throw UnsupportedOperatorException();
-}
-std::shared_ptr<Prim> PBool::Great(std::shared_ptr<Prim> other) {
-    throw UnsupportedOperatorException();
-}
 std::shared_ptr<Prim> PBool::Equal(std::shared_ptr<Prim> other) {
-    return GetInstance(value_ == Cast<PBool>(other)->value_);
+    return PBool::GetInstance(value_ == Cast<PBool>(other)->value_);
 }
 void PBool::Dump(std::ostream &os) {
     os << std::boolalpha << value_;
 }
+
+std::shared_ptr<Prim> PFun::Equal(std::shared_ptr<Prim> other) {
+    return PBool::GetInstance(this == other.get());
+}
+void PFun::Dump(std::ostream &os) {
+    os << "(" << "fun " << var_ << " -> ";
+    body_->Dump(os);
+    os << ")";
+}
+

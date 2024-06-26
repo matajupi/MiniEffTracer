@@ -20,8 +20,10 @@ public:
     void Visit(const Empty &empty) override;
     void Visit(const NInt &num) override;
     void Visit(const NBool &bol) override;
+    void Visit(const NFun &fun) override;
     void Visit(const Ident &ident) override;
     void Visit(const Let1 &let) override;
+    void Visit(const App &app) override;
     void Visit(const Add &add) override;
     void Visit(const Sub &sub) override;
     void Visit(const Mul &mul) override;
@@ -41,5 +43,8 @@ private:
 
     void ProcessBinary(const Binary &bin,
         std::function<PrimPtr(PrimPtr, PrimPtr)> app);
+    void In();
+    void Out();
+    void Newline();
     void PrintTabs();
 };

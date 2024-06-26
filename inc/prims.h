@@ -6,15 +6,19 @@
 #include <iostream>
 #include <map>
 
+#include "nodes.h"
+
+class Node;
+
 class Prim {
 public:
-    virtual std::shared_ptr<Prim> Add(std::shared_ptr<Prim> other) = 0;
-    virtual std::shared_ptr<Prim> Sub(std::shared_ptr<Prim> other) = 0;
-    virtual std::shared_ptr<Prim> Mul(std::shared_ptr<Prim> other) = 0;
-    virtual std::shared_ptr<Prim> Div(std::shared_ptr<Prim> other) = 0;
-    virtual std::shared_ptr<Prim> Less(std::shared_ptr<Prim> other) = 0;
-    virtual std::shared_ptr<Prim> Great(std::shared_ptr<Prim> other) = 0;
-    virtual std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) = 0;
+    virtual std::shared_ptr<Prim> Add(std::shared_ptr<Prim> other);
+    virtual std::shared_ptr<Prim> Sub(std::shared_ptr<Prim> other);
+    virtual std::shared_ptr<Prim> Mul(std::shared_ptr<Prim> other);
+    virtual std::shared_ptr<Prim> Div(std::shared_ptr<Prim> other);
+    virtual std::shared_ptr<Prim> Less(std::shared_ptr<Prim> other);
+    virtual std::shared_ptr<Prim> Great(std::shared_ptr<Prim> other);
+    virtual std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other);
 
     virtual void Dump(std::ostream &os) = 0;
 
@@ -53,12 +57,6 @@ public:
     PBool(bool value) : value_(value) { }
     bool GetValue() const { return value_; }
 
-    std::shared_ptr<Prim> Add(std::shared_ptr<Prim> other) override;
-    std::shared_ptr<Prim> Sub(std::shared_ptr<Prim> other) override;
-    std::shared_ptr<Prim> Mul(std::shared_ptr<Prim> other) override;
-    std::shared_ptr<Prim> Div(std::shared_ptr<Prim> other) override;
-    std::shared_ptr<Prim> Less(std::shared_ptr<Prim> other) override;
-    std::shared_ptr<Prim> Great(std::shared_ptr<Prim> other) override;
     std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
 
     void Dump(std::ostream &os) override;
@@ -66,5 +64,27 @@ public:
 private:
     bool value_;
     static std::map<bool, std::shared_ptr<PBool>> storage_;
+};
+
+class PFun : public Prim {
+public:
+    static std::shared_ptr<PFun> GetInstance(
+        std::string var, std::shared_ptr<Node> body) {
+        return std::make_shared<PFun>(var, body);
+    }
+
+    PFun(std::string var, std::shared_ptr<Node> body)
+        : var_(var), body_(body) { }
+
+    std::string GetVar() const { return var_; }
+    std::shared_ptr<Node> GetBody() const { return body_; }
+
+    std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
+
+    void Dump(std::ostream &os) override;
+
+private:
+    std::string var_;
+    std::shared_ptr<Node> body_;
 };
 

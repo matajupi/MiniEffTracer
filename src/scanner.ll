@@ -34,7 +34,7 @@ loc.step();
 %}
 
 {blank}+    loc.step();
-\n+         loc.lines(yyleng); loc.step();
+\n+         { loc.lines(yyleng); loc.step(); }
 
 "-"         return yy::parser::make_MINUS(loc);
 "+"         return yy::parser::make_PLUS(loc);
@@ -51,6 +51,8 @@ loc.step();
 "let"       return yy::parser::make_LET(loc);
 "in"        return yy::parser::make_IN(loc);
 "end"       return yy::parser::make_END(loc);
+"fun"       return yy::parser::make_FUN(loc);
+"->"        return yy::parser::make_RIGHTARROW(loc);
 
 {int}       return make_NUMBER(yytext, loc);
 {id}        return yy::parser::make_IDENT(yytext, loc);

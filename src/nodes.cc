@@ -30,6 +30,13 @@ void NBool::Dump(std::ostream &os) const {
 }
 void NBool::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
+void NFun::Dump(std::ostream &os) const {
+    os << "(" << "fun " << var_ << " -> ";
+    body_->Dump(os);
+    os << ")";
+}
+void NFun::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
 void Ident::Dump(std::ostream &os) const {
     os << str_;
 }
@@ -43,6 +50,15 @@ void Let1::Dump(std::ostream &os) const {
     os << " end";
 }
 void Let1::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void App::Dump(std::ostream &os) const {
+    os << "(";
+    fun_->Dump(os);
+    os << " ";
+    arg_->Dump(os);
+    os << ")";
+}
+void App::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void Binary::Dump(std::ostream &os) const {
     os << "(";

@@ -42,6 +42,8 @@ class Driver;
     LET     "let"
     IN      "in"
     END     "end"
+    FUN     "fun"
+    RIGHTARROW "->"
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
@@ -75,7 +77,10 @@ expr:
   | expr "<" expr { $$ = std::make_shared<Less>($1, $3); }
   | expr ">" expr { $$ = std::make_shared<Great>($1, $3); }
   | expr "=" expr { $$ = std::make_shared<Equal>($1, $3); }
-  | "let" "ident" "=" expr "in" expr "end" { $$ = std::make_shared<Let1>($2, $4, $6); }
+  | "let" "ident" "=" expr "in" expr "end"
+    { $$ = std::make_shared<Let1>($2, $4, $6); }
+  | "fun" "ident" "->" expr { $$ = std::make_shared<NFun>($2, $4); }
+  | "(" expr expr ")" { $$ = std::make_shared<App>($2, $3); }
   | "(" expr ")" { $$ = $2; }
 ;
 
