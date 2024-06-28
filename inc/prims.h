@@ -99,6 +99,8 @@ public:
         return instance_;
     }
 
+    std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
+
     void Dump(std::ostream &os) override;
 
 private:
@@ -126,3 +128,27 @@ private:
     std::shared_ptr<Prim> val1_;
     std::shared_ptr<Prim> val2_;
 };
+
+class PPrimFun : public Prim {
+public:
+    using FunType = std::function<std::shared_ptr<Prim>(std::shared_ptr<Prim>)>;
+
+    static std::shared_ptr<PPrimFun> GetInstance(std::string name, FunType fun) {
+        return std::make_shared<PPrimFun>(name, fun);
+    }
+
+    PPrimFun(std::string name, FunType fun)
+        : name_(name), fun_(fun) { };
+
+    std::string GetName() const { return name_; }
+    FunType GetFun() const { return fun_; }
+
+    std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
+
+    void Dump(std::ostream &os) override;
+
+private:
+    std::string name_;
+    FunType fun_;
+};
+

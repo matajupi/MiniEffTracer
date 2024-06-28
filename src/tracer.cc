@@ -2,6 +2,22 @@
 
 #include "excepts.h"
 
+Tracer::Tracer(std::ostream &os)
+    : tabs_(0), os_(os), env_(std::make_shared<Env>(nullptr)) {
+    RegisterPrim("fst", [](std::shared_ptr<Prim> prim) {
+        auto prod = Prim::Cast<PProduct>(prim);
+        return prod->GetVal1();
+    });
+    RegisterPrim("snd", [](std::shared_ptr<Prim> prim) {
+        auto prod = Prim::Cast<PProduct>(prim);
+        return prod->GetVal2();
+    });
+}
+
+void Tracer::RegisterPrim(std::string name, PPrimFun::FunType fun) {
+    env_->Register(name, PPrimFun::GetInstance(name, fun));
+}
+
 void Tracer::Visit(const Top &top) {
     top.GetContent()->Accept(*this);
 }
@@ -160,8 +176,9 @@ void Tracer::Visit(const App &app) {
     In();
 
     app.GetFun()->Accept(*this);
+    auto prim = std::dynamic_pointer_cast<PPrimFun>(ret_);
     auto fun = std::dynamic_pointer_cast<PFun>(ret_);
-    if (fun == nullptr) {
+    if (prim == nullptr && fun == nullptr) {
         throw UnsupportedOperatorException();
     }
 
@@ -175,16 +192,21 @@ void Tracer::Visit(const App &app) {
     os_ << "=>";
     Newline();
 
-    auto cenv = env_;
-    env_ = std::make_shared<Env>(fun->GetEnv());
-    env_->Register(fun->GetVar(), arg);
-    fun->GetBody()->Accept(*this);
-    env_ = cenv;
+    if (prim != nullptr) {
+        ret_ = prim->GetFun()(arg);
+    }
+    else {
+        auto cenv = env_;
+        env_ = std::make_shared<Env>(fun->GetEnv());
+        env_->Register(fun->GetVar(), arg);
+        fun->GetBody()->Accept(*this);
+        env_ = cenv;
 
-    Newline();
+        Newline();
 
-    os_ << "=>";
-    Newline();
+        os_ << "=>";
+        Newline();
+    }
 
     ret_->Dump(os_);
 

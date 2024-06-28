@@ -12,9 +12,7 @@
 
 class Tracer : public Visitor {
 public:
-    // TODO: Primitive functionをsetup
-    Tracer(std::ostream &os)
-        : tabs_(0), os_(os), env_(std::make_shared<Env>(nullptr)) { }
+    Tracer(std::ostream &os);
 
     void Visit(const Top &top) override;
     void Visit(const Prog &prog) override;
@@ -55,4 +53,6 @@ private:
     void Out();
     void Newline();
     void PrintTabs();
+
+    void RegisterPrim(std::string name, PPrimFun::FunType fun);
 };

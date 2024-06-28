@@ -92,6 +92,9 @@ void PFun::Dump(std::ostream &os) {
 }
 
 std::shared_ptr<PUnit> PUnit::instance_ = std::make_shared<PUnit>();
+std::shared_ptr<Prim> PUnit::Equal(std::shared_ptr<Prim> other) {
+    return PBool::GetInstance(this == Cast<PUnit>(other).get());
+}
 void PUnit::Dump(std::ostream &os) {
     os << "()";
 }
@@ -108,4 +111,11 @@ void PProduct::Dump(std::ostream &os) {
     os << ", ";
     val2_->Dump(os);
     os << ")";
+}
+
+std::shared_ptr<Prim> PPrimFun::Equal(std::shared_ptr<Prim> other) {
+    return PBool::GetInstance(this == Cast<PPrimFun>(other).get());
+}
+void PPrimFun::Dump(std::ostream &os) {
+    os << "<" << name_ << ">";
 }
