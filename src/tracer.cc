@@ -38,7 +38,7 @@ void Tracer::Visit(const Ident &ident) {
 
     os_ << "]";
 }
-void Tracer::Visit(const Let1 &let) {
+void Tracer::Visit(const Let &let) {
     In();
 
     auto var = let.GetVar();
@@ -63,7 +63,7 @@ void Tracer::Visit(const Let1 &let) {
 
     Out();
 }
-void Tracer::Visit(const LetRec1 &let) {
+void Tracer::Visit(const LetRec &let) {
     In();
 
     auto var = let.GetVar();
@@ -79,6 +79,24 @@ void Tracer::Visit(const LetRec1 &let) {
     env_->Register(var, ret_);
     let.GetCexpr()->Accept(*this);
     env_ = env_->GetParent();
+
+    Newline();
+
+    os_ << "=>";
+    Newline();
+
+    ret_->Dump(os_);
+
+    Out();
+}
+void Tracer::Visit(const Seq &seq) {
+    In();
+
+    seq.GetExpr1()->Accept(*this);
+
+    os_ << "; ";
+
+    seq.GetExpr2()->Accept(*this);
 
     Newline();
 

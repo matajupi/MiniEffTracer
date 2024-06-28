@@ -102,9 +102,9 @@ private:
     std::string str_;
 };
 
-class Let1 : public Node {
+class Let : public Node {
 public:
-    Let1(std::string var, std::shared_ptr<Node> bexpr,
+    Let(std::string var, std::shared_ptr<Node> bexpr,
         std::shared_ptr<Node> cexpr)
         : var_(var), bexpr_(bexpr), cexpr_(cexpr) { }
     void Dump(std::ostream &os) const override;
@@ -120,9 +120,9 @@ private:
     std::shared_ptr<Node> cexpr_;
 };
 
-class LetRec1 : public Node {
+class LetRec : public Node {
 public:
-    LetRec1(std::string var, std::shared_ptr<Node> bexpr,
+    LetRec(std::string var, std::shared_ptr<Node> bexpr,
         std::shared_ptr<Node> cexpr)
         : var_(var), bexpr_(bexpr), cexpr_(cexpr) { }
     void Dump(std::ostream &os) const override;
@@ -136,6 +136,21 @@ private:
     std::string var_;
     std::shared_ptr<Node> bexpr_;
     std::shared_ptr<Node> cexpr_;
+};
+
+class Seq : public Node {
+public:
+    Seq(std::shared_ptr<Node> expr1, std::shared_ptr<Node> expr2)
+        : expr1_(expr1), expr2_(expr2) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::shared_ptr<Node> GetExpr1() const { return expr1_; }
+    std::shared_ptr<Node> GetExpr2() const { return expr2_; }
+
+private:
+    std::shared_ptr<Node> expr1_;
+    std::shared_ptr<Node> expr2_;
 };
 
 class App : public Node {

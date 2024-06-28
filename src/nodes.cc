@@ -47,23 +47,32 @@ void Ident::Dump(std::ostream &os) const {
 }
 void Ident::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void Let1::Dump(std::ostream &os) const {
+void Let::Dump(std::ostream &os) const {
     os << "(" << "let " << var_ << " = ";
     bexpr_->Dump(os);
     os << " in ";
     cexpr_->Dump(os);
     os << ")";
 }
-void Let1::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void Let::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void LetRec1::Dump(std::ostream &os) const {
+void LetRec::Dump(std::ostream &os) const {
     os << "(" << "let rec " << var_ << " = ";
     bexpr_->Dump(os);
     os << " in ";
     cexpr_->Dump(os);
     os << ")";
 }
-void LetRec1::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void LetRec::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void Seq::Dump(std::ostream &os) const {
+    os << "(";
+    expr1_->Dump(os);
+    os << "; ";
+    expr2_->Dump(os);
+    os << ")";
+}
+void Seq::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void App::Dump(std::ostream &os) const {
     os << "(";

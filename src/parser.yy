@@ -43,6 +43,7 @@ class Driver;
     IN      "in"
     FUN     "fun"
     RIGHTARROW "->"
+    SEMISEMI ";;"
     IF      "if"
     THEN    "then"
     ELSE    "else"
@@ -50,7 +51,7 @@ class Driver;
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
-%nterm <std::shared_ptr<Node>> prog topexpr arithexpr appexpr btexpr
+%nterm <std::shared_ptr<Node>> prog topexpr arithexpr appexpr btexpr subexpr
 
 %printer { yyo << $$; } <*>;
 
@@ -61,16 +62,27 @@ top: prog { drv.SetResult(std::make_shared<Top>($1)); } ;
 
 prog:
     %empty { $$ = std::make_shared<Empty>(); }
-  | prog topexpr ";"";" { $$ = std::make_shared<Prog>($1, $2); } ;
+  | prog topexpr ";;" { $$ = std::make_shared<Prog>($1, $2); } ;
+
+%right ";";
 
 topexpr:
+    subexpr
+  | topexpr ";" topexpr { $$ = std::make_shared<Seq>($1, $3); }
+;
+
+subexpr:
     arithexpr
   | "fun" "ident" "->" topexpr { $$ = std::make_shared<NFun>($2, $4); }
   | "let" "ident" "=" topexpr "in" topexpr
-    { $$ = std::make_shared<Let1>($2, $4, $6); }
+    { $$ = std::make_shared<Let>($2, $4, $6); }
   | "let" "rec" "ident" "=" topexpr "in" topexpr
-    { $$ = std::make_shared<LetRec1>($3, $5, $7); }
-  | "if" topexpr "then" topexpr "else" topexpr
+    { $$ = std::make_shared<LetRec>($3, $5, $7); }
+  | "let" "ident" "ident" "=" topexpr "in" topexpr
+    { $$ = std::make_shared<Let>($2, std::make_shared<NFun>($3, $5), $7); }
+  | "let" "rec" "ident" "ident" "=" topexpr "in" topexpr
+    { $$ = std::make_shared<LetRec>($3, std::make_shared<NFun>($4, $6), $8); }
+  | "if" topexpr "then" topexpr "else" subexpr
     { $$ = std::make_shared<If>($2, $4, $6); }
 ;
 

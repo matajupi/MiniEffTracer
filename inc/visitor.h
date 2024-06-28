@@ -12,8 +12,9 @@ public:
     virtual void Visit(const NFun &fun) = 0;
     virtual void Visit(const NUnit &unit) = 0;
     virtual void Visit(const Ident &ident) = 0;
-    virtual void Visit(const Let1 &let) = 0;
-    virtual void Visit(const LetRec1 &let) = 0;
+    virtual void Visit(const Let &let) = 0;
+    virtual void Visit(const LetRec &let) = 0;
+    virtual void Visit(const Seq &seq) = 0;
     virtual void Visit(const App &app) = 0;
     virtual void Visit(const If &ifn) = 0;
     virtual void Visit(const Add &add) = 0;

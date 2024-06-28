@@ -3,6 +3,7 @@ natural n, m
 expression e ::= x | true | false | n | () | e e
     | e + e | e - e | e * e | e / e | e < e | e > e | e = e (left associative)
     | let x = e in e | let x y = e in e
+    | let rec x = e in e | let rec x y in e
     | fun x -> e
     | e; e (right associative)
     | if e then e else e

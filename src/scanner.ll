@@ -52,6 +52,7 @@ bool comment = false;
 "else"      { MKSYM(ELSE); }
 "rec"       { MKSYM(REC); }
 "->"        { MKSYM(RIGHTARROW); }
+";;"        { MKSYM(SEMISEMI); }
 "-"         { MKSYM(MINUS); }
 "+"         { MKSYM(PLUS); }
 "*"         { MKSYM(ASTER); }
