@@ -12,6 +12,11 @@ Tracer::Tracer(std::ostream &os)
         auto prod = Prim::Cast<PProduct>(prim);
         return prod->GetVal2();
     });
+    RegisterPrim("print", [&](std::shared_ptr<Prim> prim) {
+        prim->Dump(os_);
+        os_ << std::endl;
+        return PUnit::GetInstance();
+    });
 }
 
 void Tracer::RegisterPrim(std::string name, PPrimFun::FunType fun) {

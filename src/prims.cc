@@ -83,7 +83,12 @@ void PBool::Dump(std::ostream &os) {
 }
 
 std::shared_ptr<Prim> PFun::Equal(std::shared_ptr<Prim> other) {
-    return PBool::GetInstance(this == Cast<PFun>(other).get());
+    auto fun = std::dynamic_pointer_cast<PFun>(other);
+    auto prim = std::dynamic_pointer_cast<PPrimFun>(other);
+    if (fun == nullptr && prim == nullptr) {
+        throw CastFailureException();
+    }
+    return PBool::GetInstance(this == fun.get());
 }
 void PFun::Dump(std::ostream &os) {
     os << "(" << "fun " << var_ << " -> ";
@@ -114,7 +119,12 @@ void PProduct::Dump(std::ostream &os) {
 }
 
 std::shared_ptr<Prim> PPrimFun::Equal(std::shared_ptr<Prim> other) {
-    return PBool::GetInstance(this == Cast<PPrimFun>(other).get());
+    auto fun = std::dynamic_pointer_cast<PFun>(other);
+    auto prim = std::dynamic_pointer_cast<PPrimFun>(other);
+    if (fun == nullptr && prim == nullptr) {
+        throw CastFailureException();
+    }
+    return PBool::GetInstance(this == prim.get());
 }
 void PPrimFun::Dump(std::ostream &os) {
     os << "<" << name_ << ">";
