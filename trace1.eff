@@ -20,8 +20,8 @@ let backtrack = handler
 ;;
 
 let rec chooseInt p =
-    let m = (#1 p) in
-    let n = (#2 p) in
+    let m = (fst p) in
+    let n = (snd p) in
     if m > n then
         fail ()
     else
@@ -36,7 +36,7 @@ let sqrt m =
     let rec try n =
         let n2 = n * n in
         if n2 > m then
-            null
+            ()
         else if n2 = m then
             n
         else
@@ -45,8 +45,8 @@ let sqrt m =
 ;;
 
 let pythagorean p =
-    let m = (#1 p) in
-    let n = (#2 p) in
+    let m = (fst p) in
+    let n = (snd p) in
     let a = chooseInt (m, n - 1) in
     let b = chooseInt (a + 1, n) in
     let c = sqrt(a*a + b*b) in
