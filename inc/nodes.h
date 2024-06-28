@@ -153,6 +153,36 @@ private:
     std::shared_ptr<Node> cexpr_;
 };
 
+class LetDef : public Node {
+public:
+    LetDef(std::string var, std::shared_ptr<Node> bexpr)
+        : var_(var), bexpr_(bexpr) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::string GetVar() const { return var_; }
+    std::shared_ptr<Node> GetBexpr() const { return bexpr_; }
+
+private:
+    std::string var_;
+    std::shared_ptr<Node> bexpr_;
+};
+
+class LetRecDef : public Node {
+public:
+    LetRecDef(std::string var, std::shared_ptr<Node> bexpr)
+        : var_(var), bexpr_(bexpr) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::string GetVar() const { return var_; }
+    std::shared_ptr<Node> GetBexpr() const { return bexpr_; }
+
+private:
+    std::string var_;
+    std::shared_ptr<Node> bexpr_;
+};
+
 class Seq : public Node {
 public:
     Seq(std::shared_ptr<Node> expr1, std::shared_ptr<Node> expr2)

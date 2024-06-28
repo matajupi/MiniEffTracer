@@ -1,9 +1,5 @@
 #include "driver.h"
 
-Driver::Driver(bool trace_parsing, bool trace_scanning)
-    : trace_parsing_(trace_parsing), trace_scanning_(trace_scanning) {
-}
-
 int Driver::Parse(const std::string &f) {
     file_ = f;
     location_.initialize(&file_);

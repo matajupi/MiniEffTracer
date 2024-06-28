@@ -113,6 +113,31 @@ void Tracer::Visit(const LetRec &let) {
 
     Out();
 }
+void Tracer::Visit(const LetDef &let) {
+    In();
+
+    auto var = let.GetVar();
+
+    os_ << "let " << var << " = ";
+
+    let.GetBexpr()->Accept(*this);
+    env_->Register(var, ret_);
+
+    Out();
+}
+void Tracer::Visit(const LetRecDef &let) {
+    In();
+
+    auto var = let.GetVar();
+
+    os_ << "let rec " << var << " = ";
+
+    env_->Register(var, PUnit::GetInstance());
+    let.GetBexpr()->Accept(*this);
+    env_->Register(var, ret_);
+
+    Out();
+}
 void Tracer::Visit(const Seq &seq) {
     In();
 

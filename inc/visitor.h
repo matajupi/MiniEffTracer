@@ -15,6 +15,8 @@ public:
     virtual void Visit(const Ident &ident) = 0;
     virtual void Visit(const Let &let) = 0;
     virtual void Visit(const LetRec &let) = 0;
+    virtual void Visit(const LetDef &let) = 0;
+    virtual void Visit(const LetRecDef &let) = 0;
     virtual void Visit(const Seq &seq) = 0;
     virtual void Visit(const App &app) = 0;
     virtual void Visit(const If &ifn) = 0;

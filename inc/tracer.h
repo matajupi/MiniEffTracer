@@ -12,6 +12,7 @@
 
 class Tracer : public Visitor {
 public:
+    // TODO: Primitive functionをsetup
     Tracer(std::ostream &os)
         : tabs_(0), os_(os), env_(std::make_shared<Env>(nullptr)) { }
 
@@ -26,6 +27,8 @@ public:
     void Visit(const Ident &ident) override;
     void Visit(const Let &let) override;
     void Visit(const LetRec &let) override;
+    void Visit(const LetDef &let) override;
+    void Visit(const LetRecDef &let) override;
     void Visit(const Seq &seq) override;
     void Visit(const App &app) override;
     void Visit(const If &ifn) override;

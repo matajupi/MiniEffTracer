@@ -12,7 +12,8 @@ YY_DECL;
 
 class Driver {
 public:
-    Driver(bool trace_parsing = false, bool trace_scanning = false);
+    Driver(bool trace_parsing = false, bool trace_scanning = false)
+        : trace_parsing_(trace_parsing), trace_scanning_(trace_scanning) { }
 
     int Parse(const std::string &f);
     void ScanBegin();

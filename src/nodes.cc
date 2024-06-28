@@ -74,6 +74,20 @@ void LetRec::Dump(std::ostream &os) const {
 }
 void LetRec::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
+void LetDef::Dump(std::ostream &os) const {
+    os << "(" << "let " << var_ << " = ";
+    bexpr_->Dump(os);
+    os << ")";
+}
+void LetDef::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void LetRecDef::Dump(std::ostream &os) const {
+    os << "(" << "let rec " << var_ << " = ";
+    bexpr_->Dump(os);
+    os << ")";
+}
+void LetRecDef::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
 void Seq::Dump(std::ostream &os) const {
     os << "(";
     expr1_->Dump(os);
