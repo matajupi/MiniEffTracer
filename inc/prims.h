@@ -104,3 +104,25 @@ public:
 private:
     static std::shared_ptr<PUnit> instance_;
 };
+
+class PProduct : public Prim {
+public:
+    static std::shared_ptr<PProduct> GetInstance(
+        std::shared_ptr<Prim> val1, std::shared_ptr<Prim> val2) {
+        return std::make_shared<PProduct>(val1, val2);
+    }
+
+    PProduct(std::shared_ptr<Prim> val1, std::shared_ptr<Prim> val2)
+        : val1_(val1), val2_(val2) { }
+
+    std::shared_ptr<Prim> GetVal1() const { return val1_; }
+    std::shared_ptr<Prim> GetVal2() const { return val2_; }
+
+    std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
+
+    void Dump(std::ostream &os) override;
+
+private:
+    std::shared_ptr<Prim> val1_;
+    std::shared_ptr<Prim> val2_;
+};

@@ -48,6 +48,7 @@ class Driver;
     THEN    "then"
     ELSE    "else"
     REC     "rec"
+    COMMA   ","
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
@@ -113,6 +114,7 @@ btexpr:
   | "number" { $$ = std::make_shared<NInt>($1); }
   | "ident" { $$ = std::make_shared<Ident>($1); }
   | "(" ")" { $$ = std::make_shared<NUnit>(); }
+  | "(" topexpr "," topexpr ")" { $$ = std::make_shared<NProduct>($2, $4); }
   | "(" topexpr ")" { $$ = $2; }
 ;
 

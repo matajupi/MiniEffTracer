@@ -29,6 +29,30 @@ void Tracer::Visit(const NUnit &unit) {
     ret_ = PUnit::GetInstance();
     ret_->Dump(os_);
 }
+void Tracer::Visit(const NProduct &prod) {
+    In();
+
+    os_ << "(";
+
+    prod.GetExpr1()->Accept(*this);
+    auto val1 = ret_;
+
+    os_ << ", ";
+
+    prod.GetExpr2()->Accept(*this);
+    auto val2 = ret_;
+
+    os_ << ")";
+    Newline();
+
+    os_ << "=>";
+    Newline();
+
+    ret_ = PProduct::GetInstance(val1, val2);
+    ret_->Dump(os_);
+
+    Out();
+}
 void Tracer::Visit(const Ident &ident) {
     auto str = ident.GetStr();
     os_ << "[" << str << " => ";

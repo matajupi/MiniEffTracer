@@ -83,7 +83,7 @@ void PBool::Dump(std::ostream &os) {
 }
 
 std::shared_ptr<Prim> PFun::Equal(std::shared_ptr<Prim> other) {
-    return PBool::GetInstance(this == other.get());
+    return PBool::GetInstance(this == Cast<PFun>(other).get());
 }
 void PFun::Dump(std::ostream &os) {
     os << "(" << "fun " << var_ << " -> ";
@@ -94,4 +94,18 @@ void PFun::Dump(std::ostream &os) {
 std::shared_ptr<PUnit> PUnit::instance_ = std::make_shared<PUnit>();
 void PUnit::Dump(std::ostream &os) {
     os << "()";
+}
+
+std::shared_ptr<Prim> PProduct::Equal(std::shared_ptr<Prim> other) {
+    auto prod = Cast<PProduct>(other);
+    auto eq1 = Cast<PBool>(val1_->Equal(prod->val1_));
+    auto eq2 = Cast<PBool>(val2_->Equal(prod->val2_));
+    return PBool::GetInstance(eq1->GetValue() && eq2->GetValue());
+}
+void PProduct::Dump(std::ostream &os) {
+    os << "(";
+    val1_->Dump(os);
+    os << ", ";
+    val2_->Dump(os);
+    os << ")";
 }

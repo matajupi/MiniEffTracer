@@ -90,6 +90,21 @@ public:
     void Accept(Visitor &visitor) override;
 };
 
+class NProduct : public Node {
+public:
+    NProduct(std::shared_ptr<Node> expr1, std::shared_ptr<Node> expr2)
+        : expr1_(expr1), expr2_(expr2) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::shared_ptr<Node> GetExpr1() const { return expr1_; }
+    std::shared_ptr<Node> GetExpr2() const { return expr2_; }
+
+private:
+    std::shared_ptr<Node> expr1_;
+    std::shared_ptr<Node> expr2_;
+};
+
 class Ident : public Node {
 public:
     Ident(std::string str) : str_(str) { }

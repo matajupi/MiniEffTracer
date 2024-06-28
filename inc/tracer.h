@@ -22,6 +22,7 @@ public:
     void Visit(const NBool &bol) override;
     void Visit(const NFun &fun) override;
     void Visit(const NUnit &unit) override;
+    void Visit(const NProduct &prod) override;
     void Visit(const Ident &ident) override;
     void Visit(const Let &let) override;
     void Visit(const LetRec &let) override;

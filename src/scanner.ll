@@ -63,6 +63,7 @@ bool comment = false;
 "<"         { MKSYM(LESS); }
 ">"         { MKSYM(GREAT); }
 "="         { MKSYM(EQUAL); }
+","         { MKSYM(COMMA); }
 
 {int}       { if (!comment) return make_NUMBER(yytext, loc); }
 {id}        { if (!comment) return yy::parser::make_IDENT(yytext, loc); }

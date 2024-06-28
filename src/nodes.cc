@@ -42,6 +42,15 @@ void NUnit::Dump(std::ostream &os) const {
 }
 void NUnit::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
+void NProduct::Dump(std::ostream &os) const {
+    os << "(";
+    expr1_->Dump(os);
+    os << ", ";
+    expr2_->Dump(os);
+    os << ")";
+}
+void NProduct::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
 void Ident::Dump(std::ostream &os) const {
     os << str_;
 }
