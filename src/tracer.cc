@@ -184,7 +184,7 @@ void Tracer::Visit(const App &app) {
     auto prim = std::dynamic_pointer_cast<PPrimFun>(ret_);
     auto fun = std::dynamic_pointer_cast<PFun>(ret_);
     if (prim == nullptr && fun == nullptr) {
-        throw UnsupportedOperatorException();
+        throw CastFailureException();
     }
 
     os_ << " ";
@@ -231,10 +231,7 @@ void Tracer::Visit(const If &ifn) {
     os_ << "=>";
     Newline();
 
-    auto cond = std::dynamic_pointer_cast<PBool>(ret_);
-    if (cond == nullptr) {
-        throw UnsupportedOperatorException();
-    }
+    auto cond = Prim::Cast<PBool>(ret_);
     if (cond->GetValue()) {
         ifn.GetIfClause()->Accept(*this);
     }
