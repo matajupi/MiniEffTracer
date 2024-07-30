@@ -3,10 +3,14 @@ natural n, m
 expression e ::= x | true | false | n | () | e e
     | e + e | e - e | e * e | e / e | e < e | e > e | e = e (left associative)
     | let x = e in e | let x y = e in e
-    | let rec x = e in e | let rec x y in e
+    | let rec x = e in e | let rec x y = e in e
     | fun x -> e
     | e; e (right associative)
     | if e then e else e
+    | h | with e handle e
+handler h = handler ocs
+operation cases ocs = %empty | ocs '|' oc
+operation case oc = x -> c | x y z -> c
 definition d ::= let x = e | let x y = e
 (* comment *)
 

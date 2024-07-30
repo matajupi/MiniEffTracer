@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++17 -O3 -Iinc -Ibin
+CXXFLAGS = -Wall -Wextra -std=c++17 -O3 -Iinc -Ibin
 FLEX = flex
 BISON = bison
 LINT = cpplint

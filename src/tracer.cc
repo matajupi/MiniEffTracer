@@ -23,16 +23,11 @@ void Tracer::RegisterPrim(std::string name, PPrimFun::FunType fun) {
     env_->Register(name, PPrimFun::GetInstance(name, fun));
 }
 
-void Tracer::Visit(const Top &top) {
-    top.GetContent()->Accept(*this);
-}
-void Tracer::Visit(const Prog &prog) {
-    prog.GetPrev()->Accept(*this);
-    prog.GetExpr()->Accept(*this);
-    os_ << " ;; " << std::endl;
-}
-void Tracer::Visit(const Empty &empty) {
-    // Nop
+void Tracer::Visit(const NTop &top) {
+    for (auto p : *top.GetProg()) {
+        p->Accept(*this);
+        os_ << " ;;" << std::endl;
+    }
 }
 void Tracer::Visit(const NInt &num) {
     ret_ = PInt::GetInstance(num.GetValue());
@@ -74,7 +69,7 @@ void Tracer::Visit(const NProduct &prod) {
 
     Out();
 }
-void Tracer::Visit(const Ident &ident) {
+void Tracer::Visit(const NIdent &ident) {
     auto str = ident.GetStr();
     os_ << "[" << str << " => ";
 
@@ -83,7 +78,7 @@ void Tracer::Visit(const Ident &ident) {
 
     os_ << "]";
 }
-void Tracer::Visit(const Let &let) {
+void Tracer::Visit(const NLet &let) {
     In();
 
     auto var = let.GetVar();
@@ -108,7 +103,7 @@ void Tracer::Visit(const Let &let) {
 
     Out();
 }
-void Tracer::Visit(const LetRec &let) {
+void Tracer::Visit(const NLetRec &let) {
     In();
 
     auto var = let.GetVar();
@@ -134,7 +129,7 @@ void Tracer::Visit(const LetRec &let) {
 
     Out();
 }
-void Tracer::Visit(const LetDef &let) {
+void Tracer::Visit(const NLetDef &let) {
     In();
 
     auto var = let.GetVar();
@@ -146,7 +141,7 @@ void Tracer::Visit(const LetDef &let) {
 
     Out();
 }
-void Tracer::Visit(const LetRecDef &let) {
+void Tracer::Visit(const NLetRecDef &let) {
     In();
 
     auto var = let.GetVar();
@@ -159,7 +154,7 @@ void Tracer::Visit(const LetRecDef &let) {
 
     Out();
 }
-void Tracer::Visit(const Seq &seq) {
+void Tracer::Visit(const NSeq &seq) {
     In();
 
     seq.GetExpr1()->Accept(*this);
@@ -177,12 +172,12 @@ void Tracer::Visit(const Seq &seq) {
 
     Out();
 }
-void Tracer::Visit(const App &app) {
+void Tracer::Visit(const NApp &app) {
     In();
 
     app.GetFun()->Accept(*this);
-    auto prim = std::dynamic_pointer_cast<PPrimFun>(ret_);
-    auto fun = std::dynamic_pointer_cast<PFun>(ret_);
+    auto prim = Prim::TryCast<PPrimFun>(ret_);
+    auto fun = Prim::TryCast<PFun>(ret_);
     if (prim == nullptr && fun == nullptr) {
         throw CastFailureException();
     }
@@ -217,7 +212,7 @@ void Tracer::Visit(const App &app) {
 
     Out();
 }
-void Tracer::Visit(const If &ifn) {
+void Tracer::Visit(const NIf &ifn) {
     In();
 
     os_ << "if ";
@@ -247,42 +242,77 @@ void Tracer::Visit(const If &ifn) {
 
     Out();
 }
-void Tracer::Visit(const Add &add) {
+void Tracer::Visit(const NHandler &handler) {
+    ret_ = PHandler::GetInstance(handler.GetOpCs(), env_);
+    ret_->Dump(os_);
+}
+void Tracer::Visit(const NWith &with) {
+    // TODO:
+    // In();
+
+    // os_ << "with ";
+
+    // with.GetHandler()->Accept(*this);
+    // auto handler = Prim::Cast<PHandler>(ret_);
+
+    // os_ << " handle ";
+
+    // // TODO: Bind effect
+
+    // with.GetBody()->Accept(*this);
+
+    // // TODO: return handler
+
+    // Newline();
+    // os_ << "=>";
+    // Newline();
+
+    // ret_->Dump(os_);
+
+    // Out();
+}
+void Tracer::Visit(const NOpRet &opret) {
+    // TODO:
+}
+void Tracer::Visit(const NOpEff &opeff) {
+    // TODO:
+}
+void Tracer::Visit(const NAdd &add) {
     ProcessBinary(add, [](PrimPtr lval, PrimPtr rval) {
         return lval->Add(rval);
     });
 }
-void Tracer::Visit(const Sub &sub) {
+void Tracer::Visit(const NSub &sub) {
     ProcessBinary(sub, [](PrimPtr lval, PrimPtr rval) {
         return lval->Sub(rval);
     });
 }
-void Tracer::Visit(const Mul &mul) {
+void Tracer::Visit(const NMul &mul) {
     ProcessBinary(mul, [](PrimPtr lval, PrimPtr rval) {
         return lval->Mul(rval);
     });
 }
-void Tracer::Visit(const Div &div) {
+void Tracer::Visit(const NDiv &div) {
     ProcessBinary(div, [](PrimPtr lval, PrimPtr rval) {
         return lval->Div(rval);
     });
 }
-void Tracer::Visit(const Less &less) {
+void Tracer::Visit(const NLess &less) {
     ProcessBinary(less, [](PrimPtr lval, PrimPtr rval) {
         return lval->Less(rval);
     });
 }
-void Tracer::Visit(const Great &grt) {
+void Tracer::Visit(const NGreat &grt) {
     ProcessBinary(grt, [](PrimPtr lval, PrimPtr rval) {
         return lval->Great(rval);
     });
 }
-void Tracer::Visit(const Equal &eq) {
+void Tracer::Visit(const NEqual &eq) {
     ProcessBinary(eq, [](PrimPtr lval, PrimPtr rval) {
         return lval->Equal(rval);
     });
 }
-void Tracer::ProcessBinary(const Binary &bin,
+void Tracer::ProcessBinary(const NBinary &bin,
     std::function<PrimPtr(PrimPtr, PrimPtr)> app) {
     In();
 

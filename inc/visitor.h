@@ -4,28 +4,30 @@
 
 class Visitor {
 public:
-    virtual void Visit(const Top &top) = 0;
-    virtual void Visit(const Prog &prog) = 0;
-    virtual void Visit(const Empty &empty) = 0;
+    virtual void Visit(const NTop &top) = 0;
     virtual void Visit(const NInt &num) = 0;
     virtual void Visit(const NBool &bol) = 0;
     virtual void Visit(const NFun &fun) = 0;
     virtual void Visit(const NUnit &unit) = 0;
     virtual void Visit(const NProduct &prod) = 0;
-    virtual void Visit(const Ident &ident) = 0;
-    virtual void Visit(const Let &let) = 0;
-    virtual void Visit(const LetRec &let) = 0;
-    virtual void Visit(const LetDef &let) = 0;
-    virtual void Visit(const LetRecDef &let) = 0;
-    virtual void Visit(const Seq &seq) = 0;
-    virtual void Visit(const App &app) = 0;
-    virtual void Visit(const If &ifn) = 0;
-    virtual void Visit(const Add &add) = 0;
-    virtual void Visit(const Sub &sub) = 0;
-    virtual void Visit(const Mul &mul) = 0;
-    virtual void Visit(const Div &div) = 0;
-    virtual void Visit(const Less &less) = 0;
-    virtual void Visit(const Great &grt) = 0;
-    virtual void Visit(const Equal &eq) = 0;
+    virtual void Visit(const NIdent &ident) = 0;
+    virtual void Visit(const NLet &let) = 0;
+    virtual void Visit(const NLetRec &let) = 0;
+    virtual void Visit(const NLetDef &let) = 0;
+    virtual void Visit(const NLetRecDef &let) = 0;
+    virtual void Visit(const NSeq &seq) = 0;
+    virtual void Visit(const NApp &app) = 0;
+    virtual void Visit(const NIf &ifn) = 0;
+    virtual void Visit(const NHandler &handler) = 0;
+    virtual void Visit(const NWith &with) = 0;
+    virtual void Visit(const NOpRet &opret) = 0;
+    virtual void Visit(const NOpEff &opeff) = 0;
+    virtual void Visit(const NAdd &add) = 0;
+    virtual void Visit(const NSub &sub) = 0;
+    virtual void Visit(const NMul &mul) = 0;
+    virtual void Visit(const NDiv &div) = 0;
+    virtual void Visit(const NLess &less) = 0;
+    virtual void Visit(const NGreat &grt) = 0;
+    virtual void Visit(const NEqual &eq) = 0;
 };
 

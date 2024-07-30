@@ -2,23 +2,13 @@
 
 #include "visitor.h"
 
-void Top::Dump(std::ostream &os) const {
-    content_->Dump(os);
-    os << std::endl;
+void NTop::Dump(std::ostream &os) const {
+    for (auto p : *prog_) {
+        p->Dump(os);
+        os << " ;;" << std::endl;
+    }
 }
-void Top::Accept(Visitor &visitor) { visitor.Visit(*this); }
-
-void Prog::Dump(std::ostream &os) const {
-    prev_->Dump(os);
-    expr_->Dump(os);
-    os << " ;;" << std::endl;
-}
-void Prog::Accept(Visitor &visitor) { visitor.Visit(*this); }
-
-void Empty::Dump(std::ostream &os) const {
-    // Nop
-}
-void Empty::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NTop::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void NInt::Dump(std::ostream &os) const {
     os << value_;
@@ -51,62 +41,62 @@ void NProduct::Dump(std::ostream &os) const {
 }
 void NProduct::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void Ident::Dump(std::ostream &os) const {
+void NIdent::Dump(std::ostream &os) const {
     os << str_;
 }
-void Ident::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NIdent::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void Let::Dump(std::ostream &os) const {
+void NLet::Dump(std::ostream &os) const {
     os << "(" << "let " << var_ << " = ";
     bexpr_->Dump(os);
     os << " in ";
     cexpr_->Dump(os);
     os << ")";
 }
-void Let::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NLet::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void LetRec::Dump(std::ostream &os) const {
+void NLetRec::Dump(std::ostream &os) const {
     os << "(" << "let rec " << var_ << " = ";
     bexpr_->Dump(os);
     os << " in ";
     cexpr_->Dump(os);
     os << ")";
 }
-void LetRec::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NLetRec::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void LetDef::Dump(std::ostream &os) const {
+void NLetDef::Dump(std::ostream &os) const {
     os << "(" << "let " << var_ << " = ";
     bexpr_->Dump(os);
     os << ")";
 }
-void LetDef::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NLetDef::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void LetRecDef::Dump(std::ostream &os) const {
+void NLetRecDef::Dump(std::ostream &os) const {
     os << "(" << "let rec " << var_ << " = ";
     bexpr_->Dump(os);
     os << ")";
 }
-void LetRecDef::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NLetRecDef::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void Seq::Dump(std::ostream &os) const {
+void NSeq::Dump(std::ostream &os) const {
     os << "(";
     expr1_->Dump(os);
     os << "; ";
     expr2_->Dump(os);
     os << ")";
 }
-void Seq::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NSeq::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void App::Dump(std::ostream &os) const {
+void NApp::Dump(std::ostream &os) const {
     os << "(";
     fun_->Dump(os);
     os << " ";
     arg_->Dump(os);
     os << ")";
 }
-void App::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NApp::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void If::Dump(std::ostream &os) const {
+void NIf::Dump(std::ostream &os) const {
     os << "(" << "if ";
     cond_->Dump(os);
     os << " then ";
@@ -115,9 +105,39 @@ void If::Dump(std::ostream &os) const {
     else_clause_->Dump(os);
     os << ")";
 }
-void If::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NIf::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void Binary::Dump(std::ostream &os) const {
+void NHandler::Dump(std::ostream &os) const {
+    os << "(" << "handler ";
+    for (auto opc : *opcs_) {
+        opc->Dump(os);
+    }
+    os << ")";
+}
+void NHandler::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void NWith::Dump(std::ostream &os) const {
+    os << "(" << "with ";
+    handler_->Dump(os);
+    os << " handle ";
+    body_->Dump(os);
+    os << ")";
+}
+void NWith::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void NOpRet::Dump(std::ostream &os) const {
+    os << var_ << " -> ";
+    body_->Dump(os);
+}
+void NOpRet::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void NOpEff::Dump(std::ostream &os) const {
+    os << eff_ << " " << var_ << " " << cont_ << " -> ";
+    body_->Dump(os);
+}
+void NOpEff::Accept(Visitor &visitor) { visitor.Visit(*this); }
+
+void NBinary::Dump(std::ostream &os) const {
     os << "(";
     left_->Dump(os);
     os << " " << GetOpSym() << " ";
@@ -125,10 +145,10 @@ void Binary::Dump(std::ostream &os) const {
     os << ")";
 }
 
-void Add::Accept(Visitor &visitor) { visitor.Visit(*this); }
-void Sub::Accept(Visitor &visitor) { visitor.Visit(*this); }
-void Mul::Accept(Visitor &visitor) { visitor.Visit(*this); }
-void Div::Accept(Visitor &visitor) { visitor.Visit(*this); }
-void Less::Accept(Visitor &visitor) { visitor.Visit(*this); }
-void Great::Accept(Visitor &visitor) { visitor.Visit(*this); }
-void Equal::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NAdd::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NSub::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NMul::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NDiv::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NLess::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NGreat::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NEqual::Accept(Visitor &visitor) { visitor.Visit(*this); }

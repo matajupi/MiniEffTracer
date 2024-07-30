@@ -1,15 +1,5 @@
 #include "prims.h"
 
-#include "excepts.h"
-
-template <typename T>
-std::shared_ptr<T> Prim::Cast(std::shared_ptr<Prim> before) {
-    auto after = std::dynamic_pointer_cast<T>(before);
-    if (after == nullptr) {
-        throw CastFailureException();
-    }
-    return after;
-}
 std::shared_ptr<Prim> Prim::Add(std::shared_ptr<Prim> other) {
     throw UnsupportedOperatorException();
 }
@@ -83,8 +73,8 @@ void PBool::Dump(std::ostream &os) {
 }
 
 std::shared_ptr<Prim> PFun::Equal(std::shared_ptr<Prim> other) {
-    auto fun = std::dynamic_pointer_cast<PFun>(other);
-    auto prim = std::dynamic_pointer_cast<PPrimFun>(other);
+    auto fun = TryCast<PFun>(other);
+    auto prim = TryCast<PPrimFun>(other);
     if (fun == nullptr && prim == nullptr) {
         throw CastFailureException();
     }
@@ -119,8 +109,8 @@ void PProduct::Dump(std::ostream &os) {
 }
 
 std::shared_ptr<Prim> PPrimFun::Equal(std::shared_ptr<Prim> other) {
-    auto fun = std::dynamic_pointer_cast<PFun>(other);
-    auto prim = std::dynamic_pointer_cast<PPrimFun>(other);
+    auto fun = TryCast<PFun>(other);
+    auto prim = TryCast<PPrimFun>(other);
     if (fun == nullptr && prim == nullptr) {
         throw CastFailureException();
     }
@@ -129,3 +119,16 @@ std::shared_ptr<Prim> PPrimFun::Equal(std::shared_ptr<Prim> other) {
 void PPrimFun::Dump(std::ostream &os) {
     os << "<" << name_ << ">";
 }
+
+std::shared_ptr<Prim> PHandler::Equal(std::shared_ptr<Prim> other) {
+    auto handler = Cast<PHandler>(other);
+    return PBool::GetInstance(this == handler.get());
+}
+void PHandler::Dump(std::ostream &os) {
+    os << "(" << "handler ";
+    for (auto opc : *opcs_) {
+        opc->Dump(os);
+    }
+    os << ")";
+}
+

@@ -42,15 +42,18 @@ bool comment = false;
 "(*"        { comment = true; }
 "*)"        { comment = false; }
 
-"true"      { MKSYM(TRUE); }
+"handler"   { MKSYM(HANDLER); }
+"handle"    { MKSYM(HANDLE); }
 "false"     { MKSYM(FALSE); }
-"let"       { MKSYM(LET); }
-"in"        { MKSYM(IN); }
-"fun"       { MKSYM(FUN); }
-"if"        { MKSYM(IF); }
+"with"      { MKSYM(WITH); }
+"true"      { MKSYM(TRUE); }
 "then"      { MKSYM(THEN); }
 "else"      { MKSYM(ELSE); }
+"let"       { MKSYM(LET); }
 "rec"       { MKSYM(REC); }
+"fun"       { MKSYM(FUN); }
+"in"        { MKSYM(IN); }
+"if"        { MKSYM(IF); }
 "->"        { MKSYM(RIGHTARROW); }
 ";;"        { MKSYM(SEMISEMI); }
 "-"         { MKSYM(MINUS); }
@@ -64,6 +67,7 @@ bool comment = false;
 ">"         { MKSYM(GREAT); }
 "="         { MKSYM(EQUAL); }
 ","         { MKSYM(COMMA); }
+"|"         { MKSYM(VBAR); }
 
 {int}       { if (!comment) return make_NUMBER(yytext, loc); }
 {id}        { if (!comment) return yy::parser::make_IDENT(yytext, loc); }

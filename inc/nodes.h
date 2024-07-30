@@ -2,47 +2,29 @@
 
 #include <string>
 #include <ostream>
+#include <vector>
 #include <memory>
 
 class Visitor;
 
 class Node {
 public:
+    using NodeList = std::vector<std::shared_ptr<Node>>;
+
     virtual void Dump(std::ostream &os) const = 0;
     virtual void Accept(Visitor &visitor) = 0;
 };
 
-class Top : public Node {
+class NTop : public Node {
 public:
-    Top(std::shared_ptr<Node> content) : content_(content) { }
+    NTop(std::shared_ptr<NodeList> prog) : prog_(prog) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
 
-    std::shared_ptr<Node> GetContent() const { return content_; }
+    std::shared_ptr<NodeList> GetProg() const { return prog_; }
 
 private:
-    std::shared_ptr<Node> content_;
-};
-
-class Prog : public Node {
-public:
-    Prog(std::shared_ptr<Node> prev, std::shared_ptr<Node> expr)
-        : prev_(prev), expr_(expr) { }
-    void Dump(std::ostream &os) const override;
-    void Accept(Visitor &visitor) override;
-
-    std::shared_ptr<Node> GetPrev() const { return prev_; }
-    std::shared_ptr<Node> GetExpr() const { return expr_; }
-
-private:
-    std::shared_ptr<Node> prev_;
-    std::shared_ptr<Node> expr_;
-};
-
-class Empty : public Node {
-public:
-    void Dump(std::ostream &os) const override;
-    void Accept(Visitor &visitor) override;
+    std::shared_ptr<NodeList> prog_;
 };
 
 class NInt : public Node {
@@ -105,9 +87,9 @@ private:
     std::shared_ptr<Node> expr2_;
 };
 
-class Ident : public Node {
+class NIdent : public Node {
 public:
-    Ident(std::string str) : str_(str) { }
+    NIdent(std::string str) : str_(str) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
 
@@ -117,9 +99,9 @@ private:
     std::string str_;
 };
 
-class Let : public Node {
+class NLet : public Node {
 public:
-    Let(std::string var, std::shared_ptr<Node> bexpr,
+    NLet(std::string var, std::shared_ptr<Node> bexpr,
         std::shared_ptr<Node> cexpr)
         : var_(var), bexpr_(bexpr), cexpr_(cexpr) { }
     void Dump(std::ostream &os) const override;
@@ -135,9 +117,9 @@ private:
     std::shared_ptr<Node> cexpr_;
 };
 
-class LetRec : public Node {
+class NLetRec : public Node {
 public:
-    LetRec(std::string var, std::shared_ptr<Node> bexpr,
+    NLetRec(std::string var, std::shared_ptr<Node> bexpr,
         std::shared_ptr<Node> cexpr)
         : var_(var), bexpr_(bexpr), cexpr_(cexpr) { }
     void Dump(std::ostream &os) const override;
@@ -153,9 +135,9 @@ private:
     std::shared_ptr<Node> cexpr_;
 };
 
-class LetDef : public Node {
+class NLetDef : public Node {
 public:
-    LetDef(std::string var, std::shared_ptr<Node> bexpr)
+    NLetDef(std::string var, std::shared_ptr<Node> bexpr)
         : var_(var), bexpr_(bexpr) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
@@ -168,9 +150,9 @@ private:
     std::shared_ptr<Node> bexpr_;
 };
 
-class LetRecDef : public Node {
+class NLetRecDef : public Node {
 public:
-    LetRecDef(std::string var, std::shared_ptr<Node> bexpr)
+    NLetRecDef(std::string var, std::shared_ptr<Node> bexpr)
         : var_(var), bexpr_(bexpr) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
@@ -183,9 +165,9 @@ private:
     std::shared_ptr<Node> bexpr_;
 };
 
-class Seq : public Node {
+class NSeq : public Node {
 public:
-    Seq(std::shared_ptr<Node> expr1, std::shared_ptr<Node> expr2)
+    NSeq(std::shared_ptr<Node> expr1, std::shared_ptr<Node> expr2)
         : expr1_(expr1), expr2_(expr2) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
@@ -198,9 +180,9 @@ private:
     std::shared_ptr<Node> expr2_;
 };
 
-class App : public Node {
+class NApp : public Node {
 public:
-    App(std::shared_ptr<Node> fun, std::shared_ptr<Node> arg)
+    NApp(std::shared_ptr<Node> fun, std::shared_ptr<Node> arg)
         : fun_(fun), arg_(arg) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
@@ -213,9 +195,9 @@ private:
     std::shared_ptr<Node> arg_;
 };
 
-class If : public Node {
+class NIf : public Node {
 public:
-    If(std::shared_ptr<Node> cond, std::shared_ptr<Node> if_clause,
+    NIf(std::shared_ptr<Node> cond, std::shared_ptr<Node> if_clause,
         std::shared_ptr<Node> else_clause)
         : cond_(cond), if_clause_(if_clause), else_clause_(else_clause) { }
     void Dump(std::ostream &os) const override;
@@ -231,9 +213,71 @@ private:
     std::shared_ptr<Node> else_clause_;
 };
 
-class Binary : public Node {
+class NHandler : public Node {
 public:
-    Binary(std::shared_ptr<Node> left, std::shared_ptr<Node> right)
+    NHandler(std::shared_ptr<NodeList> opcs) : opcs_(opcs) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::shared_ptr<NodeList> GetOpCs() const { return opcs_; }
+
+private:
+    std::shared_ptr<NodeList> opcs_;
+};
+
+class NWith : public Node {
+public:
+    NWith(std::shared_ptr<Node> handler, std::shared_ptr<Node> body)
+        : handler_(handler), body_(body) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::shared_ptr<Node> GetHandler() const { return handler_; }
+    std::shared_ptr<Node> GetBody() const { return body_; }
+
+private:
+    std::shared_ptr<Node> handler_;
+    std::shared_ptr<Node> body_;
+};
+
+class NOpRet : public Node {
+public:
+    NOpRet(std::string var, std::shared_ptr<Node> body)
+        : var_(var), body_(body) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::string GetVar() const { return var_; }
+    std::shared_ptr<Node> GetBody() const { return body_; }
+
+private:
+    std::string var_;
+    std::shared_ptr<Node> body_;
+};
+
+class NOpEff : public Node {
+public:
+    NOpEff(std::string eff, std::string var,
+        std::string cont, std::shared_ptr<Node> body)
+        : eff_(eff), var_(var), cont_(cont), body_(body) { }
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::string GetEff() const { return eff_; }
+    std::string GetVar() const { return var_; }
+    std::string GetCont() const { return cont_; }
+    std::shared_ptr<Node> GetBody() const { return body_; }
+
+private:
+    std::string eff_;
+    std::string var_;
+    std::string cont_;
+    std::shared_ptr<Node> body_;
+};
+
+class NBinary : public Node {
+public:
+    NBinary(std::shared_ptr<Node> left, std::shared_ptr<Node> right)
         : left_(left), right_(right) { }
     void Dump(std::ostream &os) const override;
 
@@ -247,51 +291,51 @@ protected:
     std::shared_ptr<Node> right_;
 };
 
-class Add : public Binary {
+class NAdd : public NBinary {
 public:
-    using Binary::Binary;
+    using NBinary::NBinary;
     void Accept(Visitor &visitor) override;
     std::string GetOpSym() const override { return "+"; }
 };
 
-class Sub : public Binary {
+class NSub : public NBinary {
 public:
-    using Binary::Binary;
+    using NBinary::NBinary;
     void Accept(Visitor &visitor) override;
     std::string GetOpSym() const override { return "-"; }
 };
 
-class Mul : public Binary {
+class NMul : public NBinary {
 public:
-    using Binary::Binary;
+    using NBinary::NBinary;
     void Accept(Visitor &visitor) override;
     std::string GetOpSym() const override { return "*"; }
 };
 
-class Div : public Binary {
+class NDiv : public NBinary {
 public:
-    using Binary::Binary;
+    using NBinary::NBinary;
     void Accept(Visitor &visitor) override;
     std::string GetOpSym() const override { return "/"; }
 };
 
-class Less : public Binary {
+class NLess : public NBinary {
 public:
-    using Binary::Binary;
+    using NBinary::NBinary;
     void Accept(Visitor &visitor) override;
     std::string GetOpSym() const override { return "<"; }
 };
 
-class Great : public Binary {
+class NGreat : public NBinary {
 public:
-    using Binary::Binary;
+    using NBinary::NBinary;
     void Accept(Visitor &visitor) override;
     std::string GetOpSym() const override { return ">"; }
 };
 
-class Equal : public Binary {
+class NEqual : public NBinary {
 public:
-    using Binary::Binary;
+    using NBinary::NBinary;
     void Accept(Visitor &visitor) override;
     std::string GetOpSym() const override { return "="; }
 };

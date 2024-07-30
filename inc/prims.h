@@ -7,6 +7,7 @@
 #include <map>
 
 #include "nodes.h"
+#include "excepts.h"
 
 class Env;
 
@@ -22,8 +23,19 @@ public:
 
     virtual void Dump(std::ostream &os) = 0;
 
-    template<typename T>
-    static std::shared_ptr<T> Cast(std::shared_ptr<Prim> value);
+    template <typename T>
+    static std::shared_ptr<T> Cast(std::shared_ptr<Prim> before) {
+        auto after = std::dynamic_pointer_cast<T>(before);
+        if (after == nullptr) {
+            throw CastFailureException();
+        }
+        return after;
+    }
+    template <typename T>
+    static std::shared_ptr<T> TryCast(std::shared_ptr<Prim> before) {
+        auto after = std::dynamic_pointer_cast<T>(before);
+        return after;
+    }
 };
 
 class PInt : public Prim {
@@ -150,5 +162,27 @@ public:
 private:
     std::string name_;
     FunType fun_;
+};
+
+class PHandler : public Prim {
+public:
+    static std::shared_ptr<PHandler> GetInstance(
+        std::shared_ptr<Node::NodeList> opcs, std::shared_ptr<Env> env) {
+        return std::make_shared<PHandler>(opcs, env);
+    }
+
+    PHandler(std::shared_ptr<Node::NodeList> opcs, std::shared_ptr<Env> env)
+        : opcs_(opcs), env_(env) { };
+
+    // std::shared_ptr<POp> GetOpCs() const { return opcs_; }
+    std::shared_ptr<Env> GetEnv() const { return env_; }
+
+    std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
+
+    void Dump(std::ostream &os) override;
+
+private:
+    std::shared_ptr<Node::NodeList> opcs_;
+    std::shared_ptr<Env> env_;
 };
 
