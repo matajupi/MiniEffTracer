@@ -56,8 +56,10 @@ class Driver;
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
-%nterm <std::shared_ptr<Node>> topexpr arithexpr appexpr btexpr letexpr def opc
-%nterm <std::shared_ptr<Node::NodeList>> prog opcs
+%nterm <std::shared_ptr<Node>> topexpr arithexpr appexpr btexpr letexpr def
+%nterm <std::shared_ptr<NOpC>> opc
+%nterm <std::shared_ptr<NTop::Prog>> prog
+%nterm <std::shared_ptr<NHandler::NOpCList>> opcs
 
 // %printer { yyo << $$; } <*>;
 
@@ -67,7 +69,7 @@ class Driver;
 top: prog { drv.SetResult(std::make_shared<NTop>($1)); } ;
 
 prog:
-    %empty { $$ = std::make_shared<Node::NodeList>(); }
+    %empty { $$ = std::make_shared<NTop::Prog>(); }
   | prog def ";;" { $1->push_back($2); }
 ;
 
@@ -109,16 +111,16 @@ letexpr:
 
 opcs:
     %empty
-    { $$ = std::make_shared<Node::NodeList>(); }
+    { $$ = std::make_shared<NHandler::NOpCList>(); }
   | opcs "|" opc
     { $1->push_back($3); }
 ;
 
 opc:
     "ident" "->" topexpr
-    { $$ = std::make_shared<NOpRet>($1, $3); }
+    { $$ = std::make_shared<NOpC>($1, $3); }
   | "ident" "ident" "ident" "->" topexpr
-    { $$ = std::make_shared<NOpEff>($1, $2, $3, $5); }
+    { $$ = std::make_shared<NOpC>($1, $2, $3, $5); }
 ;
 
 %left "=";

@@ -17,4 +17,6 @@
     - handlerがPEffectを処理できなければ...
     - PEffect以外が帰ってきたら、POpRetによるPEffectを返す
 
-# TODO: Return caseが複数作れてしまう
+- TODO: NFun, NHandlerからPFun, PHandlerが作れるようにする
+    -> Visitをポインタ渡しにする
+- TODO: PFun, PPrimFun, POpCをPCallableで抽象化

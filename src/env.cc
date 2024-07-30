@@ -1,6 +1,6 @@
 #include "env.h"
 
-#include "excepts.h"
+#include "utils.h"
 
 std::shared_ptr<Prim> Env::Lookup(std::string var) {
     if (table_.find(var) != table_.end()) {

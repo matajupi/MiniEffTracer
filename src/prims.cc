@@ -1,5 +1,7 @@
 #include "prims.h"
 
+#include "utils.h"
+
 std::shared_ptr<Prim> Prim::Add(std::shared_ptr<Prim> other) {
     throw UnsupportedOperatorException();
 }
@@ -126,9 +128,27 @@ std::shared_ptr<Prim> PHandler::Equal(std::shared_ptr<Prim> other) {
 }
 void PHandler::Dump(std::ostream &os) {
     os << "(" << "handler ";
-    for (auto opc : *opcs_) {
-        opc->Dump(os);
+    retc_->Dump(os);
+    for (auto effc : *effcs_) {
+        os << " | ";
+        effc->Dump(os);
     }
+    os << ")";
+}
+
+std::shared_ptr<Prim> POpC::Equal(std::shared_ptr<Prim> other) {
+    auto opc = Cast<POpC>(other);
+    return PBool::GetInstance(this == opc.get());
+}
+void POpC::Dump(std::ostream &os) {
+    if (IsReturn()) {
+        os << var_ << " -> ";
+    }
+    else {
+        os << eff_ << " " << var_ << " " << cont_ << " -> ";
+    }
+    os << "(";
+    body_->Dump(os);
     os << ")";
 }
 

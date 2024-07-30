@@ -1,15 +1,15 @@
 #include "tracer.h"
 
-#include "excepts.h"
+#include "utils.h"
 
 Tracer::Tracer(std::ostream &os)
     : tabs_(0), os_(os), env_(std::make_shared<Env>(nullptr)) {
     RegisterPrim("fst", [](std::shared_ptr<Prim> prim) {
-        auto prod = Prim::Cast<PProduct>(prim);
+        auto prod = Cast<PProduct>(prim);
         return prod->GetVal1();
     });
     RegisterPrim("snd", [](std::shared_ptr<Prim> prim) {
-        auto prod = Prim::Cast<PProduct>(prim);
+        auto prod = Cast<PProduct>(prim);
         return prod->GetVal2();
     });
     RegisterPrim("print", [&](std::shared_ptr<Prim> prim) {
@@ -176,9 +176,10 @@ void Tracer::Visit(const NApp &app) {
     In();
 
     app.GetFun()->Accept(*this);
-    auto prim = Prim::TryCast<PPrimFun>(ret_);
-    auto fun = Prim::TryCast<PFun>(ret_);
-    if (prim == nullptr && fun == nullptr) {
+    auto prim = TryCast<PPrimFun>(ret_);
+    auto fun = TryCast<PFun>(ret_);
+    auto opc = TryCast<POpC>(ret_);
+    if (prim == nullptr && fun == nullptr && opc == nullptr) {
         throw CastFailureException();
     }
 
@@ -195,7 +196,7 @@ void Tracer::Visit(const NApp &app) {
     if (prim != nullptr) {
         ret_ = prim->GetFun()(arg);
     }
-    else {
+    else if (fun != nullptr) {
         auto cenv = env_;
         env_ = std::make_shared<Env>(fun->GetEnv());
         env_->Register(fun->GetVar(), arg);
@@ -206,6 +207,9 @@ void Tracer::Visit(const NApp &app) {
 
         os_ << "=>";
         Newline();
+    }
+    else {
+        // TODO: opc
     }
 
     ret_->Dump(os_);
@@ -226,7 +230,7 @@ void Tracer::Visit(const NIf &ifn) {
     os_ << "=>";
     Newline();
 
-    auto cond = Prim::Cast<PBool>(ret_);
+    auto cond = Cast<PBool>(ret_);
     if (cond->GetValue()) {
         ifn.GetIfClause()->Accept(*this);
     }
@@ -243,7 +247,14 @@ void Tracer::Visit(const NIf &ifn) {
     Out();
 }
 void Tracer::Visit(const NHandler &handler) {
-    ret_ = PHandler::GetInstance(handler.GetOpCs(), env_);
+    handler.GetRetC()->Accept(*this);
+    auto pretc = Cast<POpC>(ret_);
+    auto peffcs = std::make_shared<PHandler::POpCList>();
+    for (auto neffc : *handler.GetEffCs()) {
+        neffc->Accept(*this);
+        peffcs->push_back(Cast<POpC>(ret_));
+    }
+    ret_ = PHandler::GetInstance(pretc, peffcs);
     ret_->Dump(os_);
 }
 void Tracer::Visit(const NWith &with) {
@@ -253,7 +264,7 @@ void Tracer::Visit(const NWith &with) {
     // os_ << "with ";
 
     // with.GetHandler()->Accept(*this);
-    // auto handler = Prim::Cast<PHandler>(ret_);
+    // auto handler = Cast<PHandler>(ret_);
 
     // os_ << " handle ";
 
@@ -271,11 +282,10 @@ void Tracer::Visit(const NWith &with) {
 
     // Out();
 }
-void Tracer::Visit(const NOpRet &opret) {
-    // TODO:
-}
-void Tracer::Visit(const NOpEff &opeff) {
-    // TODO:
+void Tracer::Visit(const NOpC &opc) {
+    ret_ = POpC::GetInstance(
+        opc.GetEff(), opc.GetVar(), opc.GetCont(), opc.GetBody(), env_);
+    ret_->Dump(os_);
 }
 void Tracer::Visit(const NAdd &add) {
     ProcessBinary(add, [](PrimPtr lval, PrimPtr rval) {

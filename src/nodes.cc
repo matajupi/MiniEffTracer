@@ -1,6 +1,9 @@
 #include "nodes.h"
 
+#include <set>
+
 #include "visitor.h"
+#include "utils.h"
 
 void NTop::Dump(std::ostream &os) const {
     for (auto p : *prog_) {
@@ -107,10 +110,33 @@ void NIf::Dump(std::ostream &os) const {
 }
 void NIf::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
+NHandler::NHandler(std::shared_ptr<NOpCList> opcs)
+    : retc_(nullptr), effcs_(std::make_shared<NOpCList>()) {
+    std::set<std::string> effns;
+    for (auto opc : *opcs) {
+        if (opc->IsReturn()) {
+            if (retc_ != nullptr) {
+                throw AmbiguousHandlerException();
+            }
+            retc_ = opc;
+        }
+        else {
+            if (effns.find(opc->GetEff()) != effns.end()) {
+                throw AmbiguousHandlerException();
+            }
+            effcs_->push_back(opc);
+        }
+    }
+    if (retc_ == nullptr) {
+        retc_ = std::make_shared<NOpC>("x", std::make_shared<NIdent>("x"));
+    }
+}
 void NHandler::Dump(std::ostream &os) const {
     os << "(" << "handler ";
-    for (auto opc : *opcs_) {
-        opc->Dump(os);
+    retc_->Dump(os);
+    for (auto effc : *effcs_) {
+        os << " | ";
+        effc->Dump(os);
     }
     os << ")";
 }
@@ -125,17 +151,18 @@ void NWith::Dump(std::ostream &os) const {
 }
 void NWith::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void NOpRet::Dump(std::ostream &os) const {
-    os << var_ << " -> ";
+void NOpC::Dump(std::ostream &os) const {
+    if (IsReturn()) {
+        os << var_ << " -> ";
+    }
+    else {
+        os << eff_ << " " << var_ << " " << cont_ << " -> ";
+    }
+    os << "(";
     body_->Dump(os);
+    os << ")";
 }
-void NOpRet::Accept(Visitor &visitor) { visitor.Visit(*this); }
-
-void NOpEff::Dump(std::ostream &os) const {
-    os << eff_ << " " << var_ << " " << cont_ << " -> ";
-    body_->Dump(os);
-}
-void NOpEff::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NOpC::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void NBinary::Dump(std::ostream &os) const {
     os << "(";

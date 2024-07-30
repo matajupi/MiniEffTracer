@@ -9,22 +9,22 @@ class Visitor;
 
 class Node {
 public:
-    using NodeList = std::vector<std::shared_ptr<Node>>;
-
     virtual void Dump(std::ostream &os) const = 0;
     virtual void Accept(Visitor &visitor) = 0;
 };
 
 class NTop : public Node {
 public:
-    NTop(std::shared_ptr<NodeList> prog) : prog_(prog) { }
+    using Prog = std::vector<std::shared_ptr<Node>>;
+
+    NTop(std::shared_ptr<Prog> prog) : prog_(prog) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
 
-    std::shared_ptr<NodeList> GetProg() const { return prog_; }
+    std::shared_ptr<Prog> GetProg() const { return prog_; }
 
 private:
-    std::shared_ptr<NodeList> prog_;
+    std::shared_ptr<Prog> prog_;
 };
 
 class NInt : public Node {
@@ -213,16 +213,44 @@ private:
     std::shared_ptr<Node> else_clause_;
 };
 
-class NHandler : public Node {
+class NOpC : public Node {
 public:
-    NHandler(std::shared_ptr<NodeList> opcs) : opcs_(opcs) { }
+    NOpC(std::string var, std::shared_ptr<Node> body)
+        : NOpC("", var, "", body) { }
+    NOpC(std::string eff, std::string var,
+        std::string cont, std::shared_ptr<Node> body)
+        : eff_(eff), var_(var), cont_(cont), body_(body) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;
 
-    std::shared_ptr<NodeList> GetOpCs() const { return opcs_; }
+    std::string GetEff() const { return eff_; }
+    std::string GetVar() const { return var_; }
+    std::string GetCont() const { return cont_; }
+    std::shared_ptr<Node> GetBody() const { return body_; }
+
+    bool IsReturn() const { return eff_ == ""; }
 
 private:
-    std::shared_ptr<NodeList> opcs_;
+    std::string eff_;
+    std::string var_;
+    std::string cont_;
+    std::shared_ptr<Node> body_;
+};
+
+class NHandler : public Node {
+public:
+    using NOpCList = std::vector<std::shared_ptr<NOpC>>;
+
+    NHandler(std::shared_ptr<NOpCList> opcs);
+    void Dump(std::ostream &os) const override;
+    void Accept(Visitor &visitor) override;
+
+    std::shared_ptr<NOpC> GetRetC() const { return retc_; }
+    std::shared_ptr<NOpCList> GetEffCs() const { return effcs_; }
+
+private:
+    std::shared_ptr<NOpC> retc_;
+    std::shared_ptr<NOpCList> effcs_;
 };
 
 class NWith : public Node {
@@ -237,41 +265,6 @@ public:
 
 private:
     std::shared_ptr<Node> handler_;
-    std::shared_ptr<Node> body_;
-};
-
-class NOpRet : public Node {
-public:
-    NOpRet(std::string var, std::shared_ptr<Node> body)
-        : var_(var), body_(body) { }
-    void Dump(std::ostream &os) const override;
-    void Accept(Visitor &visitor) override;
-
-    std::string GetVar() const { return var_; }
-    std::shared_ptr<Node> GetBody() const { return body_; }
-
-private:
-    std::string var_;
-    std::shared_ptr<Node> body_;
-};
-
-class NOpEff : public Node {
-public:
-    NOpEff(std::string eff, std::string var,
-        std::string cont, std::shared_ptr<Node> body)
-        : eff_(eff), var_(var), cont_(cont), body_(body) { }
-    void Dump(std::ostream &os) const override;
-    void Accept(Visitor &visitor) override;
-
-    std::string GetEff() const { return eff_; }
-    std::string GetVar() const { return var_; }
-    std::string GetCont() const { return cont_; }
-    std::shared_ptr<Node> GetBody() const { return body_; }
-
-private:
-    std::string eff_;
-    std::string var_;
-    std::string cont_;
     std::shared_ptr<Node> body_;
 };
 

@@ -7,7 +7,6 @@
 #include <map>
 
 #include "nodes.h"
-#include "excepts.h"
 
 class Env;
 
@@ -22,20 +21,6 @@ public:
     virtual std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other);
 
     virtual void Dump(std::ostream &os) = 0;
-
-    template <typename T>
-    static std::shared_ptr<T> Cast(std::shared_ptr<Prim> before) {
-        auto after = std::dynamic_pointer_cast<T>(before);
-        if (after == nullptr) {
-            throw CastFailureException();
-        }
-        return after;
-    }
-    template <typename T>
-    static std::shared_ptr<T> TryCast(std::shared_ptr<Prim> before) {
-        auto after = std::dynamic_pointer_cast<T>(before);
-        return after;
-    }
 };
 
 class PInt : public Prim {
@@ -164,25 +149,66 @@ private:
     FunType fun_;
 };
 
-class PHandler : public Prim {
+class POpC : public Prim {
 public:
-    static std::shared_ptr<PHandler> GetInstance(
-        std::shared_ptr<Node::NodeList> opcs, std::shared_ptr<Env> env) {
-        return std::make_shared<PHandler>(opcs, env);
+    static std::shared_ptr<POpC> GetInstance(std::string var,
+        std::shared_ptr<Node> body, std::shared_ptr<Env> env) {
+        return std::make_shared<POpC>(var, body, env);
+    }
+    static std::shared_ptr<POpC> GetInstance(std::string eff, std::string var,
+        std::string cont, std::shared_ptr<Node> body, std::shared_ptr<Env> env) {
+        return std::make_shared<POpC>(eff, var, cont, body, env);
     }
 
-    PHandler(std::shared_ptr<Node::NodeList> opcs, std::shared_ptr<Env> env)
-        : opcs_(opcs), env_(env) { };
+    POpC(std::string var, std::shared_ptr<Node> body, std::shared_ptr<Env> env)
+        : POpC("", var, "", body, env) { }
+    POpC(std::string eff, std::string var, std::string cont,
+        std::shared_ptr<Node> body, std::shared_ptr<Env> env)
+        : eff_(eff), var_(var), cont_(cont), body_(body), env_(env) { }
 
-    // std::shared_ptr<POp> GetOpCs() const { return opcs_; }
+    std::string GetEff() const { return eff_; }
+    std::string GetVar() const { return var_; }
+    std::string GetCont() const { return cont_; }
+    std::shared_ptr<Node> GetBody() const { return body_; }
     std::shared_ptr<Env> GetEnv() const { return env_; }
+
+    bool IsReturn() const { return eff_ == ""; }
 
     std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
 
     void Dump(std::ostream &os) override;
 
 private:
-    std::shared_ptr<Node::NodeList> opcs_;
+    std::string eff_;
+    std::string var_;
+    std::string cont_;
+    std::shared_ptr<Node> body_;
     std::shared_ptr<Env> env_;
 };
 
+class PHandler : public Prim {
+public:
+    using POpCList = std::vector<std::shared_ptr<POpC>>;
+    using POpNList = std::vector<std::string>;
+
+    // TODO: Create TracerでPOpCを作ってくる
+    static std::shared_ptr<PHandler> GetInstance(
+        std::shared_ptr<POpC> retc, std::shared_ptr<POpCList> effcs) {
+        return std::make_shared<PHandler>(retc, effcs);
+    }
+
+    PHandler(std::shared_ptr<POpC> retc, std::shared_ptr<POpCList> effcs)
+        : retc_(retc), effcs_(effcs) { };
+
+    std::shared_ptr<POpC> GetRetC() const { return retc_; }
+    std::shared_ptr<POpCList> GetEffCs() const { return effcs_; }
+
+    std::shared_ptr<Prim> Equal(std::shared_ptr<Prim> other) override;
+
+    void Dump(std::ostream &os) override;
+
+private:
+    std::shared_ptr<POpC> retc_;
+    std::shared_ptr<POpNList> effns_;
+    std::shared_ptr<POpCList> effcs_;
+};
