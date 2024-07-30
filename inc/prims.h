@@ -189,7 +189,6 @@ private:
 class PHandler : public Prim {
 public:
     using POpCList = std::vector<std::shared_ptr<POpC>>;
-    using POpNList = std::vector<std::string>;
 
     // TODO: Create TracerでPOpCを作ってくる
     static std::shared_ptr<PHandler> GetInstance(
@@ -209,6 +208,5 @@ public:
 
 private:
     std::shared_ptr<POpC> retc_;
-    std::shared_ptr<POpNList> effns_;
     std::shared_ptr<POpCList> effcs_;
 };

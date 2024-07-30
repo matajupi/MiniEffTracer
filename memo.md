@@ -3,11 +3,6 @@
 - PPrimFunとPFun、PEffectはすべてPCallableというInterfaceを実装する
     - PCallable::Call(Tracer \*tracer);
 
-- handlerの実装:
-    - OpCs部を評価して、それぞれPOpRet, POpEffを得る
-    - POpはPFunなどと同じように、中身には立ち入らない
-    - PHandlerに格納して返す
-
 - with-handleの実装:
     - Handler部を評価して、PHandlerを得る
     - HandlerのRet以外のPOpEffを環境にバインドする
