@@ -142,14 +142,14 @@ void NHandler::Dump(std::ostream &os) const {
 }
 void NHandler::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
-void NWith::Dump(std::ostream &os) const {
+void NWithHandle::Dump(std::ostream &os) const {
     os << "(" << "with ";
     handler_->Dump(os);
     os << " handle ";
     body_->Dump(os);
     os << ")";
 }
-void NWith::Accept(Visitor &visitor) { visitor.Visit(*this); }
+void NWithHandle::Accept(Visitor &visitor) { visitor.Visit(*this); }
 
 void NOpC::Dump(std::ostream &os) const {
     if (IsReturn()) {

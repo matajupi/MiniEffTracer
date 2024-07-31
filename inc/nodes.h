@@ -253,9 +253,9 @@ private:
     std::shared_ptr<NOpCList> effcs_;
 };
 
-class NWith : public Node {
+class NWithHandle : public Node {
 public:
-    NWith(std::shared_ptr<Node> handler, std::shared_ptr<Node> body)
+    NWithHandle(std::shared_ptr<Node> handler, std::shared_ptr<Node> body)
         : handler_(handler), body_(body) { }
     void Dump(std::ostream &os) const override;
     void Accept(Visitor &visitor) override;

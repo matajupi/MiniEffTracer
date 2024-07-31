@@ -20,7 +20,7 @@ public:
     virtual void Visit(const NIf &ifn) = 0;
     virtual void Visit(const NOpC &opc) = 0;
     virtual void Visit(const NHandler &handler) = 0;
-    virtual void Visit(const NWith &with) = 0;
+    virtual void Visit(const NWithHandle &with) = 0;
     virtual void Visit(const NAdd &add) = 0;
     virtual void Visit(const NSub &sub) = 0;
     virtual void Visit(const NMul &mul) = 0;

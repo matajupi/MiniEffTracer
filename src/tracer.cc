@@ -257,8 +257,7 @@ void Tracer::Visit(const NHandler &handler) {
     ret_ = PHandler::GetInstance(pretc, peffcs);
     ret_->Dump(os_);
 }
-void Tracer::Visit(const NWith &with) {
-    // TODO:
+void Tracer::Visit(const NWithHandle &with) {
     // In();
 
     // os_ << "with ";
@@ -268,17 +267,21 @@ void Tracer::Visit(const NWith &with) {
 
     // os_ << " handle ";
 
-    // // TODO: Bind effect
+    // env_ = std::make_shared<Env>(env_);
+    // for (auto effc : *handler->GetEffCs()) {
+    //     env_->Register(effc->GetEff(), PEffect::GetInstance(effc->GetEff()));
+    // }
 
     // with.GetBody()->Accept(*this);
 
-    // // TODO: return handler
+    // // TODO: process effect
 
     // Newline();
     // os_ << "=>";
     // Newline();
 
     // ret_->Dump(os_);
+    // env_ = env_->GetParent();
 
     // Out();
 }

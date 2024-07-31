@@ -70,7 +70,7 @@ top: prog { drv.SetResult(std::make_shared<NTop>($1)); } ;
 
 prog:
     %empty { $$ = std::make_shared<NTop::Prog>(); }
-  | prog def ";;" { $1->push_back($2); }
+  | prog def ";;" { $1->push_back($2); $$ = $1; }
 ;
 
 def:
@@ -104,7 +104,7 @@ letexpr:
   | "handler" opcs
     { $$ = std::make_shared<NHandler>($2); }
   | "with" topexpr "handle" topexpr
-    { $$ = std::make_shared<NWith>($2, $4); }
+    { $$ = std::make_shared<NWithHandle>($2, $4); }
 ;
 
 %right "|";

@@ -186,11 +186,17 @@ private:
     std::shared_ptr<Env> env_;
 };
 
+class POpL : public Prim {
+public:
+    static std::shared_ptr<POpL> GetInstance(std::string eff) {
+        
+    }
+};
+
 class PHandler : public Prim {
 public:
     using POpCList = std::vector<std::shared_ptr<POpC>>;
 
-    // TODO: Create TracerでPOpCを作ってくる
     static std::shared_ptr<PHandler> GetInstance(
         std::shared_ptr<POpC> retc, std::shared_ptr<POpCList> effcs) {
         return std::make_shared<PHandler>(retc, effcs);
@@ -210,3 +216,22 @@ private:
     std::shared_ptr<POpC> retc_;
     std::shared_ptr<POpCList> effcs_;
 };
+
+// class PEffect : public Prim {
+// public:
+//     static std::shared_ptr<PEffect> GetInstance(std::string eff) {
+//         return std::make_shared<PEffect>(eff);
+//     }
+// 
+//     static std::shared_ptr<PEffect> GetInstance(std::string eff, std::shared_ptr<Prim> arg,
+//         std::shared_ptr<Node> cont) {
+//         return std::make_shared<PEffect>(eff, arg, cont);
+//     }
+// 
+//     PEffect(std::string eff) : eff_(eff), arg_(arg
+// 
+//     PEffect(std::string eff, std::shared_ptr<Prim> arg, std::shared_ptr<Node> cont)
+//         : eff_(eff), arg_(arg), cont_(cont) {
+// 
+//     }
+// };

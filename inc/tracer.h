@@ -30,7 +30,7 @@ public:
     void Visit(const NIf &ifn) override;
     void Visit(const NOpC &opc) override;
     void Visit(const NHandler &handler) override;
-    void Visit(const NWith &with) override;
+    void Visit(const NWithHandle &with) override;
     void Visit(const NAdd &add) override;
     void Visit(const NSub &sub) override;
     void Visit(const NMul &mul) override;
