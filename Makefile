@@ -25,11 +25,11 @@ prebuild:
 	mkdir -p $(B)
 
 $(TARGET): $(SRCS) $(PARSECC) $(SCANCC)
-	-@$(LINT) $(SRCS)
+	# -@$(LINT) $(SRCS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(PARSECC): $(PARSE)
-	$(BISON) -o $@ $^
+	$(BISON) -o $@ $^ -v
 
 $(SCANCC): $(SCAN)
 	$(FLEX) -o $@ $^

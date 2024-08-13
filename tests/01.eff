@@ -1,0 +1,9 @@
+let rec f n =
+    with handler
+        twice x k -> x * x; k () |
+        x -> x
+    handle
+        let x = 3 in
+            twice (twice x) + f (n - 1)
+;;
+

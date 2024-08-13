@@ -94,7 +94,20 @@ ACCEPT_IMPL(NSeq)
 void NApp::Dump(std::ostream &os) const {
     os << "(";
     if (IsPrimApp()) {
-        os << "prim";
+#define PrimFunCase(pfk, sym) case PrimFunKind::pfk: { os << sym; break; }
+        switch (pfk_) {
+            PrimFunCase(LogicAnd, "&&")
+            PrimFunCase(LogicOr, "||")
+            PrimFunCase(Equal, "=")
+            PrimFunCase(Less, "<")
+            PrimFunCase(Great, ">")
+            PrimFunCase(LessEq, "<=")
+            PrimFunCase(GreatEq, ">=")
+            PrimFunCase(Add, "+")
+            PrimFunCase(Sub, "-")
+            PrimFunCase(Mul, "*")
+            PrimFunCase(Div, "/")
+        }
     }
     else {
         fun_->Dump(os);
