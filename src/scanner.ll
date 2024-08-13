@@ -56,6 +56,10 @@ bool comment = false;
 "if"        { MKSYM(IF); }
 "->"        { MKSYM(RIGHTARROW); }
 ";;"        { MKSYM(SEMISEMI); }
+"<="        { MKSYM(LESSEQ); }
+">="        { MKSYM(GREATEQ); }
+"&&"        { MKSYM(AMPERAMPER); }
+"||"        { MKSYM(VBARVBAR); }
 "-"         { MKSYM(MINUS); }
 "+"         { MKSYM(PLUS); }
 "*"         { MKSYM(ASTER); }

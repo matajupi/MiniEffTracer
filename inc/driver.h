@@ -2,7 +2,6 @@
 
 #include <string>
 #include <map>
-#include <memory>
 #include "parser.hh"
 #include "nodes.h"
 
@@ -20,8 +19,8 @@ public:
     void ScanEnd();
 
     yy::location &GetLocation() { return location_; }
-    std::shared_ptr<Node> GetResult() { return result_; }
-    void SetResult(std::shared_ptr<Node> result) { result_ = result; }
+    Node *GetResult() { return result_; }
+    void SetResult(Node *result) { result_ = result; }
 
 private:
     std::string file_;
@@ -30,6 +29,6 @@ private:
     bool trace_parsing_;
     bool trace_scanning_;
 
-    std::shared_ptr<Node> result_;
+    Node *result_;
 };
 

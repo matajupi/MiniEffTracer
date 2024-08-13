@@ -8,7 +8,6 @@
 
 %code requires {
 #include <string>
-#include <memory>
 #include "nodes.h"
 
 class Driver;
@@ -35,7 +34,9 @@ class Driver;
     RPAREN  ")"
     SEMICOLON ";"
     LESS    "<"
+    LESSEQ  "<="
     GREAT   ">"
+    GREATEQ ">="
     EQUAL   "="
     TRUE    "true"
     FALSE   "false"
@@ -49,6 +50,9 @@ class Driver;
     ELSE    "else"
     REC     "rec"
     COMMA   ","
+    AMPERAMPER "&&"
+    VBARVBAR "||"
+
     HANDLER "handler"
     WITH    "with"
     HANDLE  "handle"
@@ -56,102 +60,109 @@ class Driver;
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
-%nterm <std::shared_ptr<Node>> topexpr arithexpr appexpr btexpr letexpr def
-%nterm <std::shared_ptr<NOpC>> opc
-%nterm <std::shared_ptr<NTop::Prog>> prog
-%nterm <std::shared_ptr<NHandler::NOpCList>> opcs
+%nterm <Node *> dec expr infix con handler opcs
 
 // %printer { yyo << $$; } <*>;
 
 %%
-%start top;
+%start prog;
 
-top: prog { drv.SetResult(std::make_shared<NTop>($1)); } ;
-
-prog:
-    %empty { $$ = std::make_shared<NTop::Prog>(); }
-  | prog def ";;" { $1->push_back($2); $$ = $1; }
+prog: dec {
+        drv.SetResult(new NTop($1));
+    }
 ;
 
-def:
-    topexpr
-  | "let" "ident" "=" topexpr { $$ = std::make_shared<NLetDef>($2, $4); }
-  | "let" "rec" "ident" "=" topexpr { $$ = std::make_shared<NLetRecDef>($3, $5); }
-  | "let" "ident" "ident" "=" topexpr { $$ = std::make_shared<NLetDef>($2, std::make_shared<NFun>($3, $5)); }
-  | "let" "rec" "ident" "ident" "=" topexpr { $$ = std::make_shared<NLetRecDef>($3, std::make_shared<NFun>($4, $6)); }
+dec:
+      expr
+    | "let" "ident" "=" expr
+        { $$ = new NLet($2, $4); }
+    | "let" "ident" "ident" "=" expr
+        { $$ = new NLet($2, new NFun($3, $5)); }
+    | "let" "rec" "ident" "=" expr
+        { $$ = new NLetRec($3, $5); }
+    | "let" "rec" "ident" "ident" "=" expr
+        { $$ = new NLetRec($3, new NFun($4, $6)); }
+    | %empty
+        { $$ = new NUnit(); }
+    | dec ";;" dec
+        { $$ = new NSeq(SeqKind::Dec, $1, $3); }
 ;
 
-%right ";";
-
-topexpr:
-    letexpr
-  | topexpr ";" topexpr { $$ = std::make_shared<NSeq>($1, $3); }
+expr:
+      con
+    | expr expr
+        { $$ = new NApp($1, $2); }
+    | infix
+    | "(" expr ")"
+        { $$ = $2; }
+    | "(" expr "," expr ")"
+        { $$ = new NPair($2, $4); }
+    | "let" "ident" "=" expr "in" expr
+        { $$ = new NLet($2, $4, $6); }
+    | "let" "ident" "ident" "=" expr "in" expr
+        { $$ = new NLet($2, new NFun($3, $5), $7); }
+    | "let" "rec" "ident" "=" expr "in" expr
+        { $$ = new NLetRec($3, $5, $7); }
+    | "let" "rec" "ident" "ident" "=" expr "in" expr
+        { $$ = new NLetRec($3, new NFun($4, $6), $8); }
+    | "if" expr "then" expr "else" expr
+        { $$ = new NCond($2, $4, $6); }
+    | "with" expr "handle" expr
+        { $$ = new NWithHandle($2, $4); }
+    | "fun" "ident" "->" expr
+        { $$ = new NFun($2, $4); }
+    | "handler" opcs
+        { $$ = new NHandler($2); }
+    | expr ";" expr
+        { $$ = new NSeq(SeqKind::Expr, $1, $3); }
 ;
-
-letexpr:
-    arithexpr
-  | "fun" "ident" "->" topexpr { $$ = std::make_shared<NFun>($2, $4); }
-  | "let" "ident" "=" topexpr "in" topexpr
-    { $$ = std::make_shared<NLet>($2, $4, $6); }
-  | "let" "rec" "ident" "=" topexpr "in" topexpr
-    { $$ = std::make_shared<NLetRec>($3, $5, $7); }
-  | "let" "ident" "ident" "=" topexpr "in" topexpr
-    { $$ = std::make_shared<NLet>($2, std::make_shared<NFun>($3, $5), $7); }
-  | "let" "rec" "ident" "ident" "=" topexpr "in" topexpr
-    { $$ = std::make_shared<NLetRec>($3, std::make_shared<NFun>($4, $6), $8); }
-  | "if" topexpr "then" topexpr "else" letexpr
-    { $$ = std::make_shared<NIf>($2, $4, $6); }
-  | "handler" opcs
-    { $$ = std::make_shared<NHandler>($2); }
-  | "with" topexpr "handle" topexpr
-    { $$ = std::make_shared<NWithHandle>($2, $4); }
-;
-
-%right "|";
 
 opcs:
-    %empty
-    { $$ = std::make_shared<NHandler::NOpCList>(); }
-  | opcs "|" opc
-    { $1->push_back($3); }
+      "ident" "->" expr
+        { $$ = new NOpCase($1, $3); }
+    | "ident" "ident" "ident" "->" expr
+        { $$ = new NOpCase($1, $2, $3, $5); }
+    | opcs "|" opcs
+        { $$ = new NSeq(SeqKind::OpCase, $1, $3); }
 ;
 
-opc:
-    "ident" "->" topexpr
-    { $$ = std::make_shared<NOpC>($1, $3); }
-  | "ident" "ident" "ident" "->" topexpr
-    { $$ = std::make_shared<NOpC>($1, $2, $3, $5); }
-;
-
+%left "&&" "||";
 %left "=";
-%left "<" ">";
+%left "<" ">" "<=" ">=";
 %left "+" "-";
 %left "*" "/";
 
-arithexpr:
-    appexpr
-  | arithexpr "=" arithexpr { $$ = std::make_shared<NEqual>($1, $3); }
-  | arithexpr "<" arithexpr { $$ = std::make_shared<NLess>($1, $3); }
-  | arithexpr ">" arithexpr { $$ = std::make_shared<NGreat>($1, $3); }
-  | arithexpr "+" arithexpr { $$ = std::make_shared<NAdd>($1, $3); }
-  | arithexpr "-" arithexpr { $$ = std::make_shared<NSub>($1, $3); }
-  | arithexpr "*" arithexpr { $$ = std::make_shared<NMul>($1, $3); }
-  | arithexpr "/" arithexpr { $$ = std::make_shared<NDiv>($1, $3); }
+infix:
+      expr "&&" expr
+        { $$ = new NApp(PrimFunKind::LogicAnd, new NPair($1, $3)); }
+    | expr "||" expr
+        { $$ = new NApp(PrimFunKind::LogicOr, new NPair($1, $3)); }
+    | expr "=" expr
+        { $$ = new NApp(PrimFunKind::Equal, new NPair($1, $3)); }
+    | expr "<" expr
+        { $$ = new NApp(PrimFunKind::Less, new NPair($1, $3)); }
+    | expr ">" expr
+        { $$ = new NApp(PrimFunKind::Great, new NPair($1, $3)); }
+    | expr "<=" expr
+        { $$ = new NApp(PrimFunKind::LessEq, new NPair($1, $3)); }
+    | expr ">=" expr
+        { $$ = new NApp(PrimFunKind::GreatEq, new NPair($1, $3)); }
+    | expr "+" expr
+        { $$ = new NApp(PrimFunKind::Add, new NPair($1, $3)); }
+    | expr "-" expr
+        { $$ = new NApp(PrimFunKind::Sub, new NPair($1, $3)); }
+    | expr "*" expr
+        { $$ = new NApp(PrimFunKind::Mul, new NPair($1, $3)); }
+    | expr "/" expr
+        { $$ = new NApp(PrimFunKind::Div, new NPair($1, $3)); }
 ;
 
-appexpr:
-    btexpr
-  | appexpr btexpr { $$ = std::make_shared<NApp>($1, $2); }
-;
-
-btexpr:
-    "true" { $$ = std::make_shared<NBool>(true); }
-  | "false" { $$ = std::make_shared<NBool>(false); }
-  | "number" { $$ = std::make_shared<NInt>($1); }
-  | "ident" { $$ = std::make_shared<NIdent>($1); }
-  | "(" ")" { $$ = std::make_shared<NUnit>(); }
-  | "(" topexpr "," topexpr ")" { $$ = std::make_shared<NProduct>($2, $4); }
-  | "(" topexpr ")" { $$ = $2; }
+con:
+      "true"    { $$ = new NBool(true); }
+    | "false"   { $$ = new NBool(false); }
+    | "number"  { $$ = new NInt($1); }
+    | "ident"   { $$ = new NIdent($1); }
+    | "(" ")"   { $$ = new NUnit(); }
 ;
 
 %%

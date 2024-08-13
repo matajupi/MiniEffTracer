@@ -98,6 +98,8 @@ letexpr := arithexpr
     | "let" "rec" ident "=" topexpr "in" topexpr
     | "let" ident ident "=" topexpr "in" topexpr
     | "let" "rec" ident ident "=" topexpr "in" topexpr
+    | "let" ident ident ident "=" topexpr "in" topexpr
+    | "let" "rec" ident ident ident "=" topexpr "in" topexpr
     | "if" topexpr "then" topexpr "else" letexpr
     | "handler" opcs
     | "with" topexpr "handle" topexpr
@@ -127,3 +129,22 @@ btexpr := "true"
     | "(" topexpr "," topexpr ")"
     | "(" topexpr ")"
 
+- もういっそのこと、continuationを取るlet文として新しく構文を定義すれば良いのでは？
+    - そのばあい、handlerの別定義は不自然
+    - どっちも追加しよう
+
+- 概念:
+    - Eval-Apply Loop
+    - lex & yaccで構文木生成 -> AST
+        - Expr
+        - BinOp<T>
+        - Const<T>
+        - If
+        - Let
+        - LetRec
+        - Fun
+    - ASTをEvaluate (Visitor pattern)
+        - ミュータブルでOK
+
+- Tracerはわかりやすさのために変数を書き換えながら処理を進める
+- TODO: effect構文の追加
