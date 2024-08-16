@@ -9,26 +9,6 @@
 
 class Visitor;
 
-enum class PrimFunKind {
-    LogicAnd,
-    LogicOr,
-    Equal,
-    Less,
-    Great,
-    LessEq,
-    GreatEq,
-    Add,
-    Sub,
-    Mul,
-    Div,
-};
-
-enum class SeqKind {
-    Dec,
-    Expr,
-    OpCase,
-};
-
 class Node {
 public:
     virtual ~Node() { }
@@ -41,10 +21,10 @@ public:
     NTop(Node *dec) : dec_(dec) { }
     ~NTop() override { delete dec_; }
 
+    Node *GetDec() const { return dec_; }
+
     DUMP_DECL override;
     ACCEPT_DECL override;
-
-    Node *GetDec() const { return dec_; }
 
 private:
     Node *dec_;
@@ -55,10 +35,10 @@ public:
     NInt(int value) : value_(value) { }
     ~NInt() override { }
 
+    int GetValue() const { return value_; }
+
     DUMP_DECL override;
     ACCEPT_DECL override;
-
-    int GetValue() const { return value_; }
 
 private:
     int value_;
@@ -69,10 +49,10 @@ public:
     NBool(bool value) : value_(value) { }
     ~NBool() override { }
 
+    bool GetValue() const { return value_; }
+
     DUMP_DECL override;
     ACCEPT_DECL override;
-
-    bool GetValue() const { return value_; }
 
 private:
     bool value_;
@@ -84,11 +64,11 @@ public:
         : var_(var), body_(body) { }
     ~NFun() override { delete body_; }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     std::string GetVar() const { return var_; }
     Node *GetBody() const { return body_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
 
 private:
     std::string var_;
@@ -112,11 +92,11 @@ public:
         delete expr2_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     Node *GetExpr1() const { return expr1_; }
     Node *GetExpr2() const { return expr2_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
 
 private:
     Node *expr1_;
@@ -128,10 +108,10 @@ public:
     NIdent(std::string str) : str_(str) { }
     ~NIdent() override { }
 
+    std::string GetStr() const { return str_; }
+
     DUMP_DECL override;
     ACCEPT_DECL override;
-
-    std::string GetStr() const { return str_; }
 
 private:
     std::string str_;
@@ -148,13 +128,13 @@ public:
         delete cexpr_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     bool IsDec() const { return cexpr_ == nullptr; }
     std::string GetVar() const { return var_; }
     Node *GetBexpr() const { return bexpr_; }
     Node *GetCexpr() const { return cexpr_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
 
 private:
     std::string var_;
@@ -173,18 +153,24 @@ public:
         delete cexpr_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     bool IsDec() const { return cexpr_ == nullptr; }
     std::string GetVar() const { return var_; }
     Node *GetBexpr() const { return bexpr_; }
     Node *GetCexpr() const { return cexpr_; }
 
+    DUMP_DECL override;
+    ACCEPT_DECL override;
+
 private:
     std::string var_;
     Node *bexpr_;
     Node *cexpr_;
+};
+
+enum class SeqKind {
+    Dec,
+    Expr,
+    OpCase,
 };
 
 class NSeq : public Node {
@@ -196,12 +182,12 @@ public:
         delete expr2_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     SeqKind GetSK() const { return sk_; }
     Node *GetExpr1() const { return expr1_; }
     Node *GetExpr2() const { return expr2_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
 
 private:
     SeqKind sk_;
@@ -213,25 +199,61 @@ class NApp : public Node {
 public:
     NApp(Node *fun, Node *arg)
         : fun_(fun), arg_(arg) { }
-    NApp(PrimFunKind pfk, Node *arg)
-        : pfk_(pfk), fun_(nullptr), arg_(arg) { }
     ~NApp() override {
         delete fun_;
         delete arg_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
-    bool IsPrimApp() const { return fun_ == nullptr; }
-    PrimFunKind GetPFK() const { return pfk_; }
     Node *GetFun() const { return fun_; }
     Node *GetArg() const { return arg_; }
 
+    DUMP_DECL override;
+    ACCEPT_DECL override;
+
 private:
-    PrimFunKind pfk_;
     Node *fun_;
     Node *arg_;
+};
+
+class NUnaryApp : public Node {
+public:
+    NUnaryApp(std::string opsym, Node *expr)
+        : opsym_(opsym), expr_(expr) { }
+    ~NUnaryApp() override {
+        delete expr_;
+    }
+
+    std::string GetOpSym() const { return opsym_; }
+    Node *GetExpr() const { return expr_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
+
+private:
+    std::string opsym_;
+    Node *expr_;
+};
+
+class NBinaryApp : public Node {
+public:
+    NBinaryApp(std::string opsym, Node *left, Node *right)
+        : opsym_(opsym), left_(left), right_(right) { }
+    ~NBinaryApp() override {
+        delete left_;
+        delete right_;
+    }
+
+    std::string GetOpSym() const { return opsym_; }
+    Node *GetLeft() const { return left_; }
+    Node *GetRight() const { return right_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
+
+private:
+    std::string opsym_;
+    Node *left_;
+    Node *right_;
 };
 
 class NCond : public Node {
@@ -244,12 +266,12 @@ public:
         delete alter_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     Node *GetCond() const { return cond_; }
     Node *GetConseq() const { return conseq_; }
     Node *GetAlter() const { return alter_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
 
 private:
     Node *cond_;
@@ -265,10 +287,10 @@ public:
         delete opcs_;
     }
 
+    Node *GetOpCases() const { return opcs_; }
+
     DUMP_DECL override;
     ACCEPT_DECL override;
-
-    Node *GetOpCases() const { return opcs_; }
 
 private:
     Node *opcs_;
@@ -284,13 +306,13 @@ public:
         delete body_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     bool IsReturnCase() const { return opname_.empty(); }
     std::string GetOpName() const { return opname_; }
     std::string GetVar() const { return var_; }
     Node *GetBody() const { return body_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
 
 private:
     std::string opname_;
@@ -308,11 +330,11 @@ public:
         delete cexpr_;
     }
 
-    DUMP_DECL override;
-    ACCEPT_DECL override;
-
     Node *GetHandler() const { return handler_; }
     Node *GetCexpr() const { return cexpr_; }
+
+    DUMP_DECL override;
+    ACCEPT_DECL override;
 
 private:
     Node *handler_;

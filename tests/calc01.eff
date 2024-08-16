@@ -1,0 +1,5 @@
+let x = 3 in
+    let y = 4 in
+        if x = 3 then
+            if y = 4 then (x, y) else (x, 0)
+        else (0, 0)

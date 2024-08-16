@@ -2,19 +2,19 @@
 
 #include <map>
 #include <string>
-#include <memory>
 
-#include "prims.h"
+#include "values.h"
 
 class Env {
 public:
-    Env(std::shared_ptr<Env> parent) : parent_(parent) { }
+    Env(Env *parent) : parent_(parent) { }
 
-    std::shared_ptr<Prim> Lookup(std::string var);
-    void Register(std::string var, std::shared_ptr<Prim> val);
-    std::shared_ptr<Env> GetParent() const { return parent_; }
+    Value *Lookup(std::string var);
+    void Register(std::string var, Value *val);
+    Env *GetParent() const { return parent_; }
 
 private:
-    std::map<std::string, std::shared_ptr<Prim>> table_;
-    std::shared_ptr<Env> parent_;
+    std::map<std::string, Value *> table_;
+    Env *parent_;
 };
+

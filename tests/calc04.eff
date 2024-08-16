@@ -1,0 +1,14 @@
+let rec fibrec n = if n <= 1 then n else fibrec (n - 1) + fibrec (n - 2) ;;
+fibrec 5 ;;
+fibrec 10 ;;
+
+let rec fibiter = fun a -> fun b -> fun n ->
+    if n = 0 then a else fibiter b (a + b) (n - 1) ;;
+fibiter 0 1 5 ;;
+fibiter 0 1 10 ;;
+
+(* fib 5 = fib 4 + fib 3 = 5 *)
+(* fib 4 = fib 3 + fib 2 = 3 *)
+(* fib 3 = fib 2 + fib 1 = 2 *)
+(* fib 2 = fib 1 + fib 0 = 1 *)
+

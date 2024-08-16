@@ -1,0 +1,13 @@
+let sqrt m =
+    let rec try n =
+        let n2 = n * n in
+        if n2 > m then
+            ()
+        else if n2 = m then
+            n
+        else
+            try (n + 1)
+    in try 0
+;;
+
+sqrt 25 ;;

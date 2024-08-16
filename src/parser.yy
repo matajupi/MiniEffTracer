@@ -60,7 +60,7 @@ class Driver;
 ;
 %token <std::string> IDENT "ident"
 %token <int> NUMBER "number"
-%nterm <Node *> dec expr topexpr opcs infix app con
+%nterm <Node *> dec expr topexpr opcs binapp unapp app con
 
 // %printer { yyo << $$; } <*>;
 
@@ -93,13 +93,13 @@ dec:
 %right ";";
 
 expr:
-    topexpr
+      topexpr
     | expr ";" expr
         { $$ = new NSeq(SeqKind::Expr, $1, $3); }
 ;
 
 topexpr:
-      infix
+      binapp
     | "let" "ident" "=" expr "in" expr
         { $$ = new NLet($2, $4, $6); }
     | "let" "ident" "ident" "=" expr "in" expr
@@ -135,30 +135,38 @@ opcs:
 %left "+" "-";
 %left "*" "/";
 
-infix:
-      app
+binapp:
+      unapp
     | topexpr "&&" topexpr
-        { $$ = new NApp(PrimFunKind::LogicAnd, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("&&", $1, $3); }
     | topexpr "||" topexpr
-        { $$ = new NApp(PrimFunKind::LogicOr, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("||", $1, $3); }
     | topexpr "=" topexpr
-        { $$ = new NApp(PrimFunKind::Equal, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("=", $1, $3); }
     | topexpr "<" topexpr
-        { $$ = new NApp(PrimFunKind::Less, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("<", $1, $3); }
     | topexpr ">" topexpr
-        { $$ = new NApp(PrimFunKind::Great, new NPair($1, $3)); }
+        { $$ = new NBinaryApp(">", $1, $3); }
     | topexpr "<=" topexpr
-        { $$ = new NApp(PrimFunKind::LessEq, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("<=", $1, $3); }
     | topexpr ">=" topexpr
-        { $$ = new NApp(PrimFunKind::GreatEq, new NPair($1, $3)); }
+        { $$ = new NBinaryApp(">=", $1, $3); }
     | topexpr "+" topexpr
-        { $$ = new NApp(PrimFunKind::Add, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("+", $1, $3); }
     | topexpr "-" topexpr
-        { $$ = new NApp(PrimFunKind::Sub, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("-", $1, $3); }
     | topexpr "*" topexpr
-        { $$ = new NApp(PrimFunKind::Mul, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("*", $1, $3); }
     | topexpr "/" topexpr
-        { $$ = new NApp(PrimFunKind::Div, new NPair($1, $3)); }
+        { $$ = new NBinaryApp("/", $1, $3); }
+;
+
+unapp:
+      app
+    | "+" topexpr
+        { $$ = new NUnaryApp("+", $2); }
+    | "-" topexpr
+        { $$ = new NUnaryApp("-", $2); }
 ;
 
 app:

@@ -17,6 +17,8 @@ public:
     virtual VISIT_DEC(NLetRec) = 0;
     virtual VISIT_DEC(NSeq) = 0;
     virtual VISIT_DEC(NApp) = 0;
+    virtual VISIT_DEC(NBinaryApp) = 0;
+    virtual VISIT_DEC(NUnaryApp) = 0;
     virtual VISIT_DEC(NCond) = 0;
     virtual VISIT_DEC(NHandler) = 0;
     virtual VISIT_DEC(NOpCase) = 0;

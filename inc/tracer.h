@@ -2,58 +2,44 @@
 
 #include <iostream>
 #include <functional>
-#include <memory>
-#include <map>
-#include <list>
 
 #include "visitor.h"
-#include "prims.h"
+#include "values.h"
 #include "env.h"
 
 class Tracer : public Visitor {
 public:
     Tracer(std::ostream &os);
 
-    void Visit(const NTop &top) override;
-    void Visit(const NInt &num) override;
-    void Visit(const NBool &bol) override;
-    void Visit(const NFun &fun) override;
-    void Visit(const NUnit &unit) override;
-    void Visit(const NProduct &prod) override;
-    void Visit(const NIdent &ident) override;
-    void Visit(const NLet &let) override;
-    void Visit(const NLetRec &let) override;
-    void Visit(const NLetDef &let) override;
-    void Visit(const NLetRecDef &let) override;
-    void Visit(const NSeq &seq) override;
-    void Visit(const NApp &app) override;
-    void Visit(const NIf &ifn) override;
-    void Visit(const NOpC &opc) override;
-    void Visit(const NHandler &handler) override;
-    void Visit(const NWithHandle &with) override;
-    void Visit(const NAdd &add) override;
-    void Visit(const NSub &sub) override;
-    void Visit(const NMul &mul) override;
-    void Visit(const NDiv &div) override;
-    void Visit(const NLess &less) override;
-    void Visit(const NGreat &grt) override;
-    void Visit(const NEqual &eq) override;
+    VISIT_DEC(NTop) override;
+    VISIT_DEC(NInt) override;
+    VISIT_DEC(NBool) override;
+    VISIT_DEC(NFun) override;
+    VISIT_DEC(NUnit) override;
+    VISIT_DEC(NPair) override;
+    VISIT_DEC(NIdent) override;
+    VISIT_DEC(NLet) override;
+    VISIT_DEC(NLetRec) override;
+    VISIT_DEC(NSeq) override;
+    VISIT_DEC(NApp) override;
+    VISIT_DEC(NBinaryApp) override;
+    VISIT_DEC(NUnaryApp) override;
+    VISIT_DEC(NCond) override;
+    VISIT_DEC(NHandler) override;
+    VISIT_DEC(NOpCase) override;
+    VISIT_DEC(NWithHandle) override;
 
 private:
-    using PrimPtr = std::shared_ptr<Prim>;
-
-    int tabs_;
     std::ostream &os_;
+    int tabs_;
 
-    PrimPtr ret_;
-    std::shared_ptr<Env> env_;
+    Value *ret_;
+    Env *env_;
 
-    void ProcessBinary(const NBinary &bin,
-        std::function<PrimPtr(PrimPtr, PrimPtr)> app);
     void In();
     void Out();
     void Newline();
+    void ArrowLine();
     void PrintTabs();
-
-    void RegisterPrim(std::string name, PPrimFun::FunType fun);
+    void RegisterPrimFun(std::string name, VPrimFun::FunType fun);
 };
