@@ -1,3 +1,5 @@
+(* McCarthy 91 function *)
+
 let rec M91 n = if n > 100 then n - 10 else M91 (M91 (n + 11)) ;;
 M91 80 ;;
 M91 120 ;;

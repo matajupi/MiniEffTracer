@@ -1,3 +1,5 @@
+(* Fibonacci number *)
+
 let rec fibrec n = if n <= 1 then n else fibrec (n - 1) + fibrec (n - 2) ;;
 fibrec 5 ;;
 fibrec 10 ;;
